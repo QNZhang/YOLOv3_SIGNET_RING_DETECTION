@@ -1,0 +1,11 @@
+# DATASET and WEIGHTS
+COCO
+weights
+
+# emacs files
+*~
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
