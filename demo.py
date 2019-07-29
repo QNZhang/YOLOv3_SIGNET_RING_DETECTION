@@ -1,13 +1,20 @@
+# -*- coding: utf-8 -*-
+
 import argparse
 import yaml
 
 import cv2
 import torch
 from torch.autograd import Variable
+import matplotlib
+import matplotlib.pyplot as plt
 
+
+from constants import BOX_COLOR
 from models.yolov3 import *
 from utils.utils import *
 from utils.parse_yolo_weights import parse_yolo_weights
+from utils.vis_bbox import vis_bbox
 
 
 def main():
@@ -34,7 +41,7 @@ def main():
     imgsize = cfg['TEST']['IMGSIZE']
     model = YOLOv3(cfg['MODEL'])
 
-    confthre = cfg['TEST']['CONFTHRE'] 
+    confthre = cfg['TEST']['CONFTHRE']
     nmsthre = cfg['TEST']['NMSTHRE']
 
     if args.detect_thresh:
@@ -75,33 +82,21 @@ def main():
         print("No Objects Deteted!!")
         return
 
-    coco_class_names, coco_class_ids, coco_class_colors = get_coco_label_names()
-
     bboxes = list()
-    classes = list()
     colors = list()
 
     for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
-
-        cls_id = coco_class_ids[int(cls_pred)]
         print(int(x1), int(y1), int(x2), int(y2), float(conf), int(cls_pred))
-        print('\t+ Label: %s, Conf: %.5f' %
-              (coco_class_names[cls_id], cls_conf.item()))
+        print('\t+ Conf: %.5f' % cls_conf.item())
         box = yolobox2label([y1, x1, y2, x2], info_img)
         bboxes.append(box)
-        classes.append(cls_id)
-        colors.append(coco_class_colors[int(cls_pred)])
+        colors.append(BOX_COLOR)
 
     if args.background:
-        import matplotlib
         matplotlib.use('Agg')
 
-    from utils.vis_bbox import vis_bbox
-    import matplotlib.pyplot as plt
-
     vis_bbox(
-        img_raw, bboxes, label=classes, label_names=coco_class_names,
-        instance_colors=colors, linewidth=2)
+        img_raw, bboxes, instance_colors=colors, linewidth=2)
     plt.show()
 
     if args.background:
