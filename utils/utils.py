@@ -153,10 +153,10 @@ def bboxes_iou(bboxes_a, bboxes_b, xyxy=True):
         area_b = torch.prod(bboxes_b[:, 2:] - bboxes_b[:, :2], 1)
     else:
         tl = torch.max((bboxes_a[:, None, :2] - bboxes_a[:, None, 2:] / 2),
-                        (bboxes_b[:, :2] - bboxes_b[:, 2:] / 2))
+                       (bboxes_b[:, :2] - bboxes_b[:, 2:] / 2))
         # bottom right
         br = torch.min((bboxes_a[:, None, :2] + bboxes_a[:, None, 2:] / 2),
-                        (bboxes_b[:, :2] + bboxes_b[:, 2:] / 2))
+                       (bboxes_b[:, :2] + bboxes_b[:, 2:] / 2))
 
         area_a = torch.prod(bboxes_a[:, 2:], 1)
         area_b = torch.prod(bboxes_b[:, 2:], 1)
@@ -255,7 +255,7 @@ def preprocess(img, imgsize, jitter, random_placing=False):
         dw = jitter * w
         dh = jitter * h
         new_ar = (w + np.random.uniform(low=-dw, high=dw))\
-                 / (h + np.random.uniform(low=-dh, high=dh))
+            / (h + np.random.uniform(low=-dh, high=dh))
     else:
         new_ar = w / h
 
@@ -281,6 +281,7 @@ def preprocess(img, imgsize, jitter, random_placing=False):
     info_img = (h, w, nh, nw, dx, dy)
     return sized, info_img
 
+
 def rand_scale(s):
     """
     calculate random scaling factor
@@ -294,6 +295,7 @@ def rand_scale(s):
     if np.random.rand() > 0.5:
         return scale
     return 1 / scale
+
 
 def random_distort(img, hue, saturation, exposure):
     """

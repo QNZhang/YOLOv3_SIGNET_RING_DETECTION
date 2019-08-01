@@ -1,24 +1,29 @@
+# -*- coding: utf-8 -*-
+""" train """
+
 from __future__ import division
-
-from utils.utils import *
-from utils.cocoapi_evaluator import COCOAPIEvaluator
-from utils.parse_yolo_weights import parse_yolo_weights
-from models.yolov3 import *
-from dataset.cocodataset import *
-
 import os
+import random
 import argparse
 import yaml
-import random
+import pdb
 
 import torch
 from torch.autograd import Variable
 import torch.optim as optim
 
+from constants import Dataset as dataset_option
+from datasets.managers import get_dataset_class
+from models.yolov3 import YOLOv3
+from utils.evaluators.managers import get_evaluator_class
+# from utils.evaluators.evaluators import COCOAPIEvaluator
+from utils.parse_yolo_weights import parse_yolo_weights
+# from utils.utils import *
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--cfg', type=str, default='config/yolov3_default.cfg',
+    parser.add_argument('--cfg', type=str, default='config/yolov3_default_digestpath.cfg',
                         help='config file. see readme')
     parser.add_argument('--weights_path', type=str,
                         default=None, help='darknet weights file')
@@ -27,7 +32,7 @@ def parse_args():
     parser.add_argument('--checkpoint_interval', type=int,
                         default=1000, help='interval between saving checkpoints')
     parser.add_argument('--eval_interval', type=int,
-                            default=4000, help='interval between evaluations')
+                        default=4000, help='interval between evaluations')
     parser.add_argument('--checkpoint', type=str,
                         help='pytorch checkpoint file path')
     parser.add_argument('--checkpoint_dir', type=str,
@@ -38,6 +43,9 @@ def parse_args():
                         help='debug mode where only one image is trained')
     parser.add_argument(
         '--tfboard', help='tensorboard path for logging', type=str, default=None)
+    parser.add_argument(
+        '--dataset', help='dataset to work with: {}'.format(dataset_option.print_choices()),
+        type=int, default=dataset_option.SIGNET_RING)
     return parser.parse_args()
 
 
@@ -98,7 +106,7 @@ def main():
             model.load_state_dict(state)
 
     if cuda:
-        print("using cuda") 
+        print("using cuda")
         model = model.cuda()
 
     if args.tfboard:
@@ -109,21 +117,25 @@ def main():
     model.train()
 
     imgsize = cfg['TRAIN']['IMGSIZE']
-    dataset = COCODataset(model_type=cfg['MODEL']['TYPE'],
-                  data_dir='COCO/',
-                  img_size=imgsize,
-                  augmentation=cfg['AUGMENTATION'],
-                  debug=args.debug)
+
+    dataset = get_dataset_class(args.dataset)(model_type=cfg['MODEL']['TYPE'],
+                                              img_size=imgsize,
+                                              augmentation=cfg['AUGMENTATION'],
+                                              debug=args.debug)
 
     dataloader = torch.utils.data.DataLoader(
         dataset, batch_size=batch_size, shuffle=True, num_workers=args.n_cpu)
     dataiterator = iter(dataloader)
 
-    evaluator = COCOAPIEvaluator(model_type=cfg['MODEL']['TYPE'],
-                    data_dir='COCO/',
-                    img_size=cfg['TEST']['IMGSIZE'],
-                    confthre=cfg['TEST']['CONFTHRE'],
-                    nmsthre=cfg['TEST']['NMSTHRE'])
+    # evaluator = COCOAPIEvaluator(model_type=cfg['MODEL']['TYPE'],
+    #                              data_dir='COCO/',
+    #                              img_size=cfg['TEST']['IMGSIZE'],
+    #                              confthre=cfg['TEST']['CONFTHRE'],
+    #                              nmsthre=cfg['TEST']['NMSTHRE'])
+    evaluator = get_evaluator_class(args.dataset)(model_type=cfg['MODEL']['TYPE'],
+                                                  img_size=cfg['TEST']['IMGSIZE'],
+                                                  confthre=cfg['TEST']['CONFTHRE'],
+                                                  nmsthre=cfg['TEST']['NMSTHRE'])
 
     dtype = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 
@@ -133,9 +145,9 @@ def main():
     params = []
     for key, value in params_dict.items():
         if 'conv.weight' in key:
-            params += [{'params':value, 'weight_decay':decay * batch_size * subdivision}]
+            params += [{'params': value, 'weight_decay': decay * batch_size * subdivision}]
         else:
-            params += [{'params':value, 'weight_decay':0.0}]
+            params += [{'params': value, 'weight_decay': 0.0}]
     optimizer = optim.SGD(params, lr=base_lr, momentum=momentum,
                           dampening=0, weight_decay=decay * batch_size * subdivision)
 
@@ -151,17 +163,17 @@ def main():
     # start training loop
     for iter_i in range(iter_state, iter_size + 1):
 
-        # COCO evaluation
+        # SIGNET evaluation
         if iter_i % args.eval_interval == 0 and iter_i > 0:
             ap50_95, ap50 = evaluator.evaluate(model)
             model.train()
             if args.tfboard:
-                tblogger.add_scalar('val/COCOAP50', ap50, iter_i)
-                tblogger.add_scalar('val/COCOAP50_95', ap50_95, iter_i)
+                tblogger.add_scalar('val/SIGNETAP50', ap50, iter_i)
+                tblogger.add_scalar('val/SIGNETAP50_95', ap50_95, iter_i)
 
         # subdivision loop
         optimizer.zero_grad()
-        for inner_iter_i in range(subdivision):
+        for _ in range(subdivision):
             try:
                 imgs, targets, _, _ = next(dataiterator)  # load a batch
             except StopIteration:
@@ -169,6 +181,7 @@ def main():
                 imgs, targets, _, _ = next(dataiterator)  # load a batch
             imgs = Variable(imgs.type(dtype))
             targets = Variable(targets.type(dtype), requires_grad=False)
+            # hereeeeee
             loss = model(imgs, targets)
             loss.backward()
 
@@ -182,7 +195,7 @@ def main():
                   '[Losses: xy %f, wh %f, conf %f, cls %f, total %f, imgsize %d]'
                   % (iter_i, iter_size, current_lr,
                      model.loss_dict['xy'], model.loss_dict['wh'],
-                     model.loss_dict['conf'], model.loss_dict['cls'], 
+                     model.loss_dict['conf'], model.loss_dict['cls'],
                      model.loss_dict['l2'], imgsize),
                   flush=True)
 
@@ -204,7 +217,12 @@ def main():
                         'model_state_dict': model.state_dict(),
                         'optimizer_state_dict': optimizer.state_dict(),
                         },
-                        os.path.join(args.checkpoint_dir, "snapshot"+str(iter_i)+".ckpt"))
+                       os.path.join(args.checkpoint_dir, "snapshot"+str(iter_i)+".ckpt"))
+
+        # comment #############################################################
+        raise Exception('WAAAAAaaaa')
+        # TODO: REview that I'm passing the zero class too...
+
     if args.tfboard:
         tblogger.close()
 
