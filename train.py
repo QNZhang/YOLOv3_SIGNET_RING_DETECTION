@@ -181,7 +181,6 @@ def main():
                 imgs, targets, _, _ = next(dataiterator)  # load a batch
             imgs = Variable(imgs.type(dtype))
             targets = Variable(targets.type(dtype), requires_grad=False)
-            # hereeeeee
             loss = model(imgs, targets)
             loss.backward()
 
@@ -220,6 +219,7 @@ def main():
                        os.path.join(args.checkpoint_dir, "snapshot"+str(iter_i)+".ckpt"))
 
         # comment #############################################################
+        # hereeeeeeee
         raise Exception('WAAAAAaaaa')
         # TODO: REview that I'm passing the zero class too...
 
