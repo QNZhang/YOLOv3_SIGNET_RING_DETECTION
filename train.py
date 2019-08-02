@@ -9,6 +9,7 @@ import random
 import time
 import yaml
 
+from tensorboardX import SummaryWriter
 import torch
 from torch.autograd import Variable
 import torch.optim as optim
@@ -18,6 +19,10 @@ from datasets.managers import get_dataset_class
 from models.yolov3 import YOLOv3
 from utils.evaluators.managers import get_evaluator_class
 from utils.parse_yolo_weights import parse_yolo_weights
+from utils.utils import get_tensorboard_log_path
+
+
+torch.backends.cudnn.benchmark = True
 
 
 def parse_args():
@@ -43,7 +48,11 @@ def parse_args():
                         default=False,
                         help='debug mode where only one image is trained')
     parser.add_argument(
-        '--tfboard', help='tensorboard path for logging', type=str, default=None)
+        '--tfboard',
+        type=lambda x: bool(distutils.util.strtobool(x)),
+        help='Enable logging for tensorboardX',
+        default=False
+    )
     parser.add_argument(
         '--dataset', help='dataset to work with: {}'.format(dataset_option.print_choices()),
         type=int, default=dataset_option.SIGNET_RING)
@@ -112,8 +121,7 @@ def main():
 
     if args.tfboard:
         print("using tfboard")
-        from tensorboardX import SummaryWriter
-        tblogger = SummaryWriter(args.tfboard)
+        tblogger = SummaryWriter(get_tensorboard_log_path(args.dataset))
 
     model.train()
 

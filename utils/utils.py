@@ -1,7 +1,15 @@
+# -*- coding: utf-8 -*-
+""" utils/utils """
+
 from __future__ import division
+
 import torch
 import numpy as np
 import cv2
+
+from constants import Dataset
+from core.exceptions import DatasetIdInvalid
+import settings
 
 
 def nms(bbox, thresh, score=None, limit=None):
@@ -364,3 +372,16 @@ def get_coco_label_names():
     coco_cls_colors = np.random.randint(128, 255, size=(80, 3))
 
     return coco_label_names, coco_class_ids, coco_cls_colors
+
+
+def get_tensorboard_log_path(option):
+    """ Returns the tensorboard log path for the chosen option """
+    if not Dataset.is_valid_option(option):
+        raise DatasetIdInvalid()
+
+    log_paths = {
+        Dataset.COCO: settings.TENSORBOARD_COCO_LOG_PATH,
+        Dataset.SIGNET_RING: settings.TENSORBOARD_SIGNET_LOG_PATH,
+    }
+
+    return log_paths[option]

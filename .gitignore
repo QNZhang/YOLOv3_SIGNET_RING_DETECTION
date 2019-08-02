@@ -5,6 +5,12 @@ weights
 # emacs files
 *~
 
+# tensorboard logs
+tensorboard_logs
+
+# model checkpoints
+checkpoints
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

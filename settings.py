@@ -19,3 +19,8 @@ SIGNET_BOUNDING_BOXES_PATH = os.path.join(DIGEST_PATH_2019_PATH, 'python_app', '
 SIGNET_TRAIN_PATH = os.path.join(DIGEST_PATH_2019_PATH, 'python_app', 'data', 'signet_train.pickle')
 # serialized list
 SIGNET_TEST_PATH = os.path.join(DIGEST_PATH_2019_PATH, 'python_app', 'data', 'signet_test.pickle')
+
+
+# TENSORBOARD
+TENSORBOARD_SIGNET_LOG_PATH = 'tensorboard_logs/signet_logs'
+TENSORBOARD_COCO_LOG_PATH = 'tensorboard_logs/coco_logs'
