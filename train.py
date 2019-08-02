@@ -2,11 +2,12 @@
 """ train """
 
 from __future__ import division
+import argparse
+import distutils
 import os
 import random
-import argparse
+import time
 import yaml
-import pdb
 
 import torch
 from torch.autograd import Variable
@@ -38,7 +39,7 @@ def parse_args():
     parser.add_argument('--checkpoint_dir', type=str,
                         default='checkpoints',
                         help='directory where checkpoint files are saved')
-    parser.add_argument('--use_cuda', type=bool, default=True)
+    parser.add_argument('--use_cuda', type=lambda x: bool(distutils.util.strtobool(x)), default=True)
     parser.add_argument('--debug', action='store_true', default=False,
                         help='debug mode where only one image is trained')
     parser.add_argument(
@@ -161,6 +162,7 @@ def main():
     scheduler = optim.lr_scheduler.LambdaLR(optimizer, burnin_schedule)
 
     # start training loop
+    start = time.time()
     for iter_i in range(iter_state, iter_size + 1):
 
         # SIGNET evaluation
@@ -218,10 +220,8 @@ def main():
                         },
                        os.path.join(args.checkpoint_dir, "snapshot"+str(iter_i)+".ckpt"))
 
-        # comment #############################################################
-        # hereeeeeeee
-        raise Exception('WAAAAAaaaa')
-        # TODO: REview that I'm passing the zero class too...
+    end = time.time()
+    print(end-start)
 
     if args.tfboard:
         tblogger.close()
