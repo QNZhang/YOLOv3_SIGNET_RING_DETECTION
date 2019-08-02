@@ -17,9 +17,7 @@ from constants import Dataset as dataset_option
 from datasets.managers import get_dataset_class
 from models.yolov3 import YOLOv3
 from utils.evaluators.managers import get_evaluator_class
-# from utils.evaluators.evaluators import COCOAPIEvaluator
 from utils.parse_yolo_weights import parse_yolo_weights
-# from utils.utils import *
 
 
 def parse_args():
@@ -128,11 +126,6 @@ def main():
         dataset, batch_size=batch_size, shuffle=True, num_workers=args.n_cpu)
     dataiterator = iter(dataloader)
 
-    # evaluator = COCOAPIEvaluator(model_type=cfg['MODEL']['TYPE'],
-    #                              data_dir='COCO/',
-    #                              img_size=cfg['TEST']['IMGSIZE'],
-    #                              confthre=cfg['TEST']['CONFTHRE'],
-    #                              nmsthre=cfg['TEST']['NMSTHRE'])
     evaluator = get_evaluator_class(args.dataset)(model_type=cfg['MODEL']['TYPE'],
                                                   img_size=cfg['TEST']['IMGSIZE'],
                                                   confthre=cfg['TEST']['CONFTHRE'],
