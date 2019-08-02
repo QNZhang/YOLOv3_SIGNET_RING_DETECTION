@@ -38,7 +38,9 @@ def parse_args():
                         default='checkpoints',
                         help='directory where checkpoint files are saved')
     parser.add_argument('--use_cuda', type=lambda x: bool(distutils.util.strtobool(x)), default=True)
-    parser.add_argument('--debug', action='store_true', default=False,
+    parser.add_argument('--debug',
+                        type=lambda x: bool(distutils.util.strtobool(x)),
+                        default=False,
                         help='debug mode where only one image is trained')
     parser.add_argument(
         '--tfboard', help='tensorboard path for logging', type=str, default=None)
