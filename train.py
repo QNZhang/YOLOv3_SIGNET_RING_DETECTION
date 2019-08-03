@@ -75,6 +75,7 @@ def main():
 
     print("successfully loaded config file: ", cfg)
 
+    evaluate_dataset = cfg.get('EVALUATE', False)
     momentum = cfg['TRAIN']['MOMENTUM']
     decay = cfg['TRAIN']['DECAY']
     burn_in = cfg['TRAIN']['BURN_IN']
@@ -160,12 +161,16 @@ def main():
     if args.checkpoint:
         if 'optimizer_state_dict' in state.keys():
             optimizer.load_state_dict(state['optimizer_state_dict'])
-            iter_state = state['iter'] + 1
+            if not evaluate_dataset:
+                iter_state = state['iter'] + 1
 
     scheduler = optim.lr_scheduler.LambdaLR(optimizer, burnin_schedule)
 
     # start training loop
     start = time.time()
+
+    print('Initial iter state {}'.format(iter_state))
+
     for iter_i in range(iter_state, iter_size + 1):
 
         # SIGNET evaluation
@@ -224,7 +229,7 @@ def main():
                        os.path.join(args.checkpoint_dir, "snapshot"+str(iter_i)+".ckpt"))
 
     end = time.time()
-    print(end-start)
+    print("Training time in seconds: {}".format(end-start))
 
     if args.tfboard:
         tblogger.close()

@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 """ utils/evaluators/evaluators """
 
-from collections import defaultdict
 import json
-import pdb
 import tempfile
 
 from pycocotools.cocoeval import COCOeval
 import torch
 from torch.autograd import Variable
 
-# from dataset.cocodataset import *
-from core.classes import BndBox
+# import constants
 from datasets.datasets import COCODataset, SignetRing
 import settings
 from utils.evaluators.detection_evaluators import SignetRingEval
@@ -77,8 +74,6 @@ class COCOAPIEvaluator():
         while True:  # all the data in val2017
             try:
                 img, _, info_img, id_ = next(dataiterator)  # load a batch
-                pdb.set_trace()
-                return 0
             except StopIteration:
                 break
             info_img = [float(info) for info in info_img]
@@ -177,7 +172,7 @@ class SignetRingEvaluator:
         cuda = torch.cuda.is_available()
         Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
         ids = []
-        data_dict = defaultdict(list)
+        data_dict = []
         dataiterator = iter(self.dataloader)
         output_counter = 0
         while True:  # all the data in validation dataset
@@ -186,7 +181,10 @@ class SignetRingEvaluator:
             except StopIteration:
                 break
             info_img = [float(info) for info in info_img]
-            id_ = int(id_)
+            # XXX: For some reason torch.utils.data.dataloader.DataLoader is Wrapping
+            #      id_ with a tuple...
+            # id_ = int(id_)
+            id_ = id_[0]
             ids.append(id_)
             with torch.no_grad():
                 img = Variable(img.type(Tensor))
@@ -202,16 +200,19 @@ class SignetRingEvaluator:
                 y1 = float(output[1])
                 x2 = float(output[2])
                 y2 = float(output[3])
-                label = self.dataset.class_ids[int(output[6])]
+                # label = self.dataset.class_ids[int(output[6])]
+                # XXX: Take a look to the following line, it should be good ...
+                # label = constants.SIGNET_RING_CLASS_ID
+                label = int(output[6])
                 box = yolobox2label((y1, x1, y2, x2), info_img)
                 bbox = [box[1], box[0], box[3] - box[1], box[2] - box[0]]
                 score = float(output[4].data.item() * output[5].data.item())  # object score * class score
 
                 output_counter += 1
-                data_dict[id_].append({
+                data_dict.append({
                     "category_id": label,
                     "image_id": id_,
-                    "bbox": BndBox(xmin=x1, ymin=y1, xmax=x2, ymax=y2),
+                    "bbox": bbox,
                     "score": score,
                     'area': abs(y2-y1) * abs(x2-x1),
                     'id': output_counter,

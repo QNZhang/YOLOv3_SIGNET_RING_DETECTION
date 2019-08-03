@@ -8,11 +8,13 @@ def main():
     """  """
     # os.system('python demo.py --image data/mountain.png --detect_thresh 0.5 --weights_path weights/yolov3.weights')
 
-    # os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard log')
-    # os.system('python train.py --weights_path weights/darknet53.conv.74 --n_cpu=12')
-    os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard True')
+    # os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard True --checkpoint_interval=500 --eval_interval=1000')
+    # os.system('python train.py --tfboard True --checkpoint_interval=500 --eval_interval=1000 --checkpoint checkpoints/snapshot500_.ckpt')
+
+    # os.system('python train.py --cfg config/yolov3_eval_digestpath.cfg --eval_interval 1 --checkpoint checkpoints/snapshot1000.ckpt')
+    # os.system('python train.py --cfg config/yolov3_eval_digestpath.cfg --eval_interval 1 --weights_path weights/yolov3.weights')
+    os.system('python train.py --cfg config/yolov3_eval_digestpath.cfg --eval_interval 1 --weights_path weights/darknet53.conv.74 ')
     # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    # os.system('python train.py --weights_path weights/darknet53.conv.74 --cfg=config/yolov3_default.cfg --dataset={}'.format(dataset_option.COCO))
 
 
 if __name__ == '__main__':

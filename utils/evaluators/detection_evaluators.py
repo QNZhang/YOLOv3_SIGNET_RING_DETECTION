@@ -103,14 +103,14 @@ class SignetRingEval:
         #     gts = self.signetGt.loadAnns(self.signetGt.getAnnIds(imgIds=p.imgIds))
         #     dts = self.signetDt.loadAnns(self.signetDt.getAnnIds(imgIds=p.imgIds))
         gts = self.signetGt.get_annotations(self.signetGt.get_img_ids(), to_dict=True)
-        dts = tuple(self.signetDt.values())
+        dts = self.signetDt
 
         # TODO: review this ignore flag (try replacing iscrowd by occluded)
         # set ignore flag
         for gt in gts:
             gt['ignore'] = gt['ignore'] if 'ignore' in gt else 0
             # gt['ignore'] = 'iscrowd' in gt and gt['iscrowd']
-            gt['ignore'] = 'occluded' in gt and gt['occluded']
+            gt['ignore'] = gt['details'].occluded
             # if p.iouType == 'keypoints':
             #     gt['ignore'] = (gt['num_keypoints'] == 0) or gt['ignore']
         self._gts = defaultdict(list)       # gt for evaluation
@@ -122,6 +122,7 @@ class SignetRingEval:
         for dt in dts:
             # self._dts[dt['image_id'], dt['category_id']].append(dt)
             self._dts[dt['image_id'], constants.SIGNET_RING_CLASS_ID].append(dt)
+
         self.evalImgs = defaultdict(list)   # per-image per-category evaluation results
         self.eval = {}                  # accumulated evaluation results
 
@@ -181,15 +182,15 @@ class SignetRingEval:
             dt = dt[0:p.maxDets[-1]]
 
         if p.iouType == 'bbox':
-            g = [g['bbox'] for g in gt]
-            d = [d['bbox'] for d in dt]
+            g_ = [[g['bbox'].xmin, g['bbox'].ymin, g['width'], g['height']] for g in gt]
+            d_ = [d['bbox'] for d in dt]
         else:
             raise Exception('unknown iouType for iou computation')
 
         # compute iou between each dt and gt region
         # iscrowd = [int(o['iscrowd']) for o in gt]
-        iscrowd = [int(o['occluded']) for o in gt]
-        ious = maskUtils.iou(d, g, iscrowd)
+        iscrowd = [o['details'].occluded for o in gt]
+        ious = maskUtils.iou(d_, g_, iscrowd)
         return ious
 
     def evaluateImg(self, imgId, catId, aRng, maxDet):
@@ -221,7 +222,7 @@ class SignetRingEval:
         dtind = np.argsort([-d['score'] for d in dt], kind='mergesort')
         dt = [dt[i] for i in dtind[0:maxDet]]
         # iscrowd = [int(o['iscrowd']) for o in gt]
-        iscrowd = [int(o['occluded']) for o in gt]
+        iscrowd = [o['details'].occluded for o in gt]
         # load computed ious
         ious = self.ious[imgId, catId][:, gtind] if len(self.ious[imgId, catId]) > 0 else self.ious[imgId, catId]
 
