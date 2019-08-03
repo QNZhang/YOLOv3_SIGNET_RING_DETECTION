@@ -23,7 +23,7 @@ def main():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', type=int, default=0)
-    parser.add_argument('--cfg', type=str, default='config/yolov3_default.cfg')
+    parser.add_argument('--cfg', type=str, default='config/yolov3_default_digestpath.cfg')
     parser.add_argument('--ckpt', type=str,
                         help='path to the checkpoint file')
     parser.add_argument('--weights_path', type=str,
