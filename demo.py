@@ -10,7 +10,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 
-from constants import BOX_COLOR
+from constants import BOX_COLOR, Dataset
 from models.yolov3 import *
 from utils.utils import *
 from utils.parse_yolo_weights import parse_yolo_weights
@@ -33,6 +33,10 @@ def main():
                         default=False, help='background(no-display mode. save "./output.png")')
     parser.add_argument('--detect_thresh', type=float,
                         default=None, help='confidence threshold')
+    parser.add_argument(
+        '--dataset', help='dataset to work with: {}'.format(Dataset.print_choices()),
+        type=int, default=Dataset.SIGNET_RING)
+
     args = parser.parse_args()
 
     with open(args.cfg, 'r') as f:
@@ -76,7 +80,7 @@ def main():
 
     with torch.no_grad():
         outputs = model(img)
-        outputs = postprocess(outputs, 80, confthre, nmsthre)
+        outputs = postprocess(outputs, Dataset.NUM_CLASSES[args.dataset], confthre, nmsthre)
 
     if outputs[0] is None:
         print("No Objects Deteted!!")

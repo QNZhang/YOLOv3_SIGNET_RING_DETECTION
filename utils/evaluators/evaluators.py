@@ -8,7 +8,7 @@ from pycocotools.cocoeval import COCOeval
 import torch
 from torch.autograd import Variable
 
-# import constants
+from constants import Dataset
 from datasets.datasets import COCODataset, SignetRing
 import settings
 from utils.evaluators.detection_evaluators import SignetRingEval
@@ -83,7 +83,7 @@ class COCOAPIEvaluator():
                 img = Variable(img.type(Tensor))
                 outputs = model(img)
                 outputs = postprocess(
-                    outputs, 80, self.confthre, self.nmsthre)
+                    outputs, Dataset.NUM_CLASSES[Dataset.COCO], self.confthre, self.nmsthre)
                 if outputs[0] is None:
                     continue
                 outputs = outputs[0].cpu().data
@@ -190,7 +190,7 @@ class SignetRingEvaluator:
                 img = Variable(img.type(Tensor))
                 outputs = model(img)
                 outputs = postprocess(
-                    outputs, 80, self.confthre, self.nmsthre)
+                    outputs, Dataset.NUM_CLASSES[Dataset.SIGNET_RING], self.confthre, self.nmsthre)
                 if outputs[0] is None:
                     continue
                 outputs = outputs[0].cpu().data

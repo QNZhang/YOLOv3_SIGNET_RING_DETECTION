@@ -22,6 +22,11 @@ class Dataset:
         DatasetItem(SIGNET_RING, 'Signet Ring'),
     ]
 
+    NUM_CLASSES = {
+        COCO: 80,
+        SIGNET_RING: 2,
+    }
+
     @classmethod
     def is_valid_option(cls, dataset_id):
         """ Returns True if the provided id is among the database implementations """
