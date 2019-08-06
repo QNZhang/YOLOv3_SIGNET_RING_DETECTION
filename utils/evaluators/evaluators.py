@@ -225,6 +225,6 @@ class SignetRingEvaluator:
             signet_eval.evaluate()
             signet_eval.accumulate()
             signet_eval.summarize()
-            return signet_eval.stats[0], signet_eval.stats[1]
+            return signet_eval.stats[0], signet_eval.stats[6]
         else:
             return 0, 0

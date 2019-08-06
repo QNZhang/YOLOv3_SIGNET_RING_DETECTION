@@ -3,8 +3,10 @@
 
 import os
 
+###############################################################################
+#                                   Dataset paths
+###############################################################################
 
-# Dataset paths
 COCO_PATH = 'COCO'
 
 
@@ -20,7 +22,29 @@ SIGNET_TRAIN_PATH = os.path.join(DIGEST_PATH_2019_PATH, 'python_app', 'data', 's
 # serialized list
 SIGNET_TEST_PATH = os.path.join(DIGEST_PATH_2019_PATH, 'python_app', 'data', 'signet_test.pickle')
 
+###############################################################################
+#                                   Evaluation
+###############################################################################
 
-# TENSORBOARD
+EVAL_LINEAR_SPACE_LOWER_BOUND = 0.3
+EVAL_LINEAR_SPACE_UPPER_BOUND = 0.95
+EVAL_LINEAR_SPACE_STEP = 0.05  # spacing between samples
+# XXX: After modifying these values, you must do the following updates:
+# utils/evaluators/detection_evaluators.py:SignetRingEval.summarize._summarizeDets
+#   What is stored on stats variable
+# utils/evaluators/evaluators:SignetRingEvaluator.evaluate
+#   What it returned taking into account the previous modifications. These two
+#   objects will be used when logging values for tensorboardX
+# train:main
+#   Just update the following lines properly taking into account the previous
+#   modifications:
+#   ap30, ar30 = evaluator.evaluate(model)
+#   tblogger.add_scalar('val/SIGNETAP30', ap30, iter_i)
+#   tblogger.add_scalar('val/SIGNETAR30', ar30, iter_i)
+
+###############################################################################
+#                                   TENSORBOARD
+###############################################################################
+
 TENSORBOARD_SIGNET_LOG_PATH = 'tensorboard_logs/signet_logs'
 TENSORBOARD_COCO_LOG_PATH = 'tensorboard_logs/coco_logs'

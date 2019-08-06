@@ -175,11 +175,11 @@ def main():
 
         # SIGNET evaluation
         if iter_i % args.eval_interval == 0 and iter_i > 0:
-            ap50_95, ap50 = evaluator.evaluate(model)
+            ap30, ar30 = evaluator.evaluate(model)
             model.train()
             if args.tfboard:
-                tblogger.add_scalar('val/SIGNETAP50', ap50, iter_i)
-                tblogger.add_scalar('val/SIGNETAP50_95', ap50_95, iter_i)
+                tblogger.add_scalar('val/SIGNETAP30', ap30, iter_i)
+                tblogger.add_scalar('val/SIGNETAR30', ar30, iter_i)
 
         # subdivision loop
         optimizer.zero_grad()

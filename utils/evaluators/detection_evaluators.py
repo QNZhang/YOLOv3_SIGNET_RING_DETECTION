@@ -10,6 +10,7 @@ import numpy as np
 from pycocotools import mask as maskUtils
 
 import constants
+import settings
 
 
 class SignetRingEval:
@@ -31,7 +32,7 @@ class SignetRingEval:
     # The evaluation parameters are as follows (defaults in brackets):
     #  imgIds     - [all] N img ids to use for evaluation
     #  catIds     - [all] K cat ids to use for evaluation
-    #  iouThrs    - [.5:.05:.95] T=10 IoU thresholds for evaluation
+    #  iouThrs    - [settings.EVAL_LINEAR_SPACE_LOWER_BOUND:settings.EVAL_LINEAR_SPACE_STEP:settings.EVAL_LINEAR_SPACE_UPPER_BOUND] T=10 IoU thresholds for evaluation
     #  recThrs    - [0:.01:1] R=101 recall thresholds for evaluation
     #  areaRng    - [...] A=4 object area ranges for evaluation
     #  maxDets    - [1 10 100] M=3 thresholds on max detections per image
@@ -150,7 +151,6 @@ class SignetRingEval:
         catIds = p.catIds if p.useCats else [-1]
 
         computeIoU = self.computeIoU
-
         self.ious = {(imgId, catId): computeIoU(imgId, catId)
                      for imgId in p.imgIds
                      for catId in catIds}
@@ -249,6 +249,8 @@ class SignetRingEval:
                         # continue to next gt unless better match made
                         if ious[dind, gind] < iou:
                             continue
+                        # comment #############################################
+                        # here matches based on IoU are stored
                         # if match successful and best so far, store appropriately
                         iou = ious[dind, gind]
                         m = gind
@@ -422,19 +424,32 @@ class SignetRingEval:
             return mean_s
 
         def _summarizeDets():
-            stats = np.zeros((12,))
-            stats[0] = _summarize(1)
-            stats[1] = _summarize(1, iouThr=.5, maxDets=self.params.maxDets[2])
-            stats[2] = _summarize(1, iouThr=.75, maxDets=self.params.maxDets[2])
-            stats[3] = _summarize(1, areaRng='small', maxDets=self.params.maxDets[2])
-            stats[4] = _summarize(1, areaRng='medium', maxDets=self.params.maxDets[2])
-            stats[5] = _summarize(1, areaRng='large', maxDets=self.params.maxDets[2])
-            stats[6] = _summarize(0, maxDets=self.params.maxDets[0])
-            stats[7] = _summarize(0, maxDets=self.params.maxDets[1])
-            stats[8] = _summarize(0, maxDets=self.params.maxDets[2])
-            stats[9] = _summarize(0, areaRng='small', maxDets=self.params.maxDets[2])
-            stats[10] = _summarize(0, areaRng='medium', maxDets=self.params.maxDets[2])
-            stats[11] = _summarize(0, areaRng='large', maxDets=self.params.maxDets[2])
+            # stats = np.zeros((12,))
+            # stats[0] = _summarize(1)
+            # stats[1] = _summarize(1, iouThr=.5, maxDets=self.params.maxDets[2])
+            # stats[2] = _summarize(1, iouThr=.75, maxDets=self.params.maxDets[2])
+            # stats[3] = _summarize(1, areaRng='small', maxDets=self.params.maxDets[2])
+            # stats[4] = _summarize(1, areaRng='medium', maxDets=self.params.maxDets[2])
+            # stats[5] = _summarize(1, areaRng='large', maxDets=self.params.maxDets[2])
+            # stats[6] = _summarize(0, maxDets=self.params.maxDets[0])
+            # stats[7] = _summarize(0, maxDets=self.params.maxDets[1])
+            # stats[8] = _summarize(0, maxDets=self.params.maxDets[2])
+            # stats[9] = _summarize(0, areaRng='small', maxDets=self.params.maxDets[2])
+            # stats[10] = _summarize(0, areaRng='medium', maxDets=self.params.maxDets[2])
+            # stats[11] = _summarize(0, areaRng='large', maxDets=self.params.maxDets[2])
+
+            stats = np.zeros((10,))
+            stats[0] = _summarize(1, iouThr=.3, maxDets=self.params.maxDets[2])
+            stats[1] = _summarize(1, iouThr=.3, areaRng='small', maxDets=self.params.maxDets[2])
+            stats[2] = _summarize(1, iouThr=.3, areaRng='medium', maxDets=self.params.maxDets[2])
+            stats[3] = _summarize(1, iouThr=.3, areaRng='large', maxDets=self.params.maxDets[2])
+            stats[4] = _summarize(0, iouThr=.3, maxDets=self.params.maxDets[0])
+            stats[5] = _summarize(0, iouThr=.3, maxDets=self.params.maxDets[1])
+            stats[6] = _summarize(0, iouThr=.3, maxDets=self.params.maxDets[2])
+            stats[7] = _summarize(0, iouThr=.3, areaRng='small', maxDets=self.params.maxDets[2])
+            stats[8] = _summarize(0, iouThr=.3, areaRng='medium', maxDets=self.params.maxDets[2])
+            stats[9] = _summarize(0, iouThr=.3, areaRng='large', maxDets=self.params.maxDets[2])
+
             return stats
 
         if not self.eval:
@@ -449,32 +464,35 @@ class SignetRingEval:
 
 class Params:
     '''
-    Params for coco evaluation api
+    Params for SignetRingEval
+    Inspired on https://github.com/cocodataset/cocoapi/blob/master/PythonAPI/pycocotools/cocoeval.py
     '''
-    # TODO: If nothing is changed then import it from cocoeval.py
 
-    def setDetParams(self):
+    def setBasicParams(self):
         self.imgIds = []
         self.catIds = []
         # np.arange causes trouble.  the data point on arange is slightly larger than the true value
-        self.iouThrs = np.linspace(.5, 0.95, np.round((0.95 - .5) / .05) + 1, endpoint=True)
+        self.iouThrs = np.linspace(
+            settings.EVAL_LINEAR_SPACE_LOWER_BOUND,
+            settings.EVAL_LINEAR_SPACE_UPPER_BOUND,
+            np.round((
+                settings.EVAL_LINEAR_SPACE_UPPER_BOUND - settings.EVAL_LINEAR_SPACE_LOWER_BOUND) / settings.EVAL_LINEAR_SPACE_STEP) + 1,
+            endpoint=True
+        )
         self.recThrs = np.linspace(.0, 1.00, np.round((1.00 - .0) / .01) + 1, endpoint=True)
+        self.useCats = 1
+
+    def setDetParams(self):
+        self.setBasicParams()
         self.maxDets = [1, 10, 100]
         self.areaRng = [[0 ** 2, 1e5 ** 2], [0 ** 2, 32 ** 2], [32 ** 2, 96 ** 2], [96 ** 2, 1e5 ** 2]]
         self.areaRngLbl = ['all', 'small', 'medium', 'large']
-        # TODO: Try with useCats = 0
-        self.useCats = 1
 
     def setKpParams(self):
-        self.imgIds = []
-        self.catIds = []
-        # np.arange causes trouble.  the data point on arange is slightly larger than the true value
-        self.iouThrs = np.linspace(.5, 0.95, np.round((0.95 - .5) / .05) + 1, endpoint=True)
-        self.recThrs = np.linspace(.0, 1.00, np.round((1.00 - .0) / .01) + 1, endpoint=True)
+        self.setBasicParams()
         self.maxDets = [20]
         self.areaRng = [[0 ** 2, 1e5 ** 2], [32 ** 2, 96 ** 2], [96 ** 2, 1e5 ** 2]]
         self.areaRngLbl = ['all', 'medium', 'large']
-        self.useCats = 1
 
     def __init__(self, iouType='segm'):
         if iouType == 'segm' or iouType == 'bbox':

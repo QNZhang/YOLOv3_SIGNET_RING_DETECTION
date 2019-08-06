@@ -46,8 +46,8 @@ def nms(bbox, thresh, score=None, limit=None):
         tl = np.maximum(b[:2], bbox[selec, :2])
         br = np.minimum(b[2:], bbox[selec, 2:])
         area = np.prod(br - tl, axis=1) * (tl < br).all(axis=1)
-
         iou = area / (bbox_area[i] + bbox_area[selec] - area)
+
         if (iou >= thresh).any():
             continue
 
