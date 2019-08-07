@@ -6,11 +6,15 @@ import copy
 import datetime
 import time
 
+import colorama
 import numpy as np
 from pycocotools import mask as maskUtils
 
 import constants
 import settings
+
+
+colorama.init()
 
 
 class SignetRingEval:
@@ -391,9 +395,15 @@ class SignetRingEval:
         Compute and display summary metrics for evaluation results.
         Note this functin can *only* be applied on the default parameter setting
         '''
-        def _summarize(ap=1, iouThr=None, areaRng='all', maxDets=100):
+        def _summarize(ap=1, iouThr=None, areaRng='all', maxDets=100, highlight=False):
+            colorama.reinit()
+            color_prefix = color_suffix = ''
+            if highlight:
+                color_prefix = colorama.Fore.CYAN
+                color_suffix = colorama.Fore.RESET
+
             p = self.params
-            iStr = ' {:<18} {} @[ IoU={:<9} | area={:>6s} | maxDets={:>3d} ] = {:0.3f}'
+            iStr = ' {}{:<18} {} @[ IoU={:<9} | area={:>6s} | maxDets={:>3d} ] = {:0.3f}{}'
             titleStr = 'Average Precision' if ap == 1 else 'Average Recall'
             typeStr = '(AP)' if ap == 1 else '(AR)'
             iouStr = '{:0.2f}:{:0.2f}'.format(p.iouThrs[0], p.iouThrs[-1]) \
@@ -420,7 +430,9 @@ class SignetRingEval:
                 mean_s = -1
             else:
                 mean_s = np.mean(s[s > -1])
-            print(iStr.format(titleStr, typeStr, iouStr, areaRng, maxDets, mean_s))
+            print(iStr.format(
+                color_prefix, titleStr, typeStr, iouStr, areaRng, maxDets, mean_s, color_suffix))
+            colorama.deinit()
             return mean_s
 
         def _summarizeDets():
@@ -439,13 +451,13 @@ class SignetRingEval:
             # stats[11] = _summarize(0, areaRng='large', maxDets=self.params.maxDets[2])
 
             stats = np.zeros((10,))
-            stats[0] = _summarize(1, iouThr=.3, maxDets=self.params.maxDets[2])
+            stats[0] = _summarize(1, iouThr=.3, maxDets=self.params.maxDets[2], highlight=True)
             stats[1] = _summarize(1, iouThr=.3, areaRng='small', maxDets=self.params.maxDets[2])
             stats[2] = _summarize(1, iouThr=.3, areaRng='medium', maxDets=self.params.maxDets[2])
             stats[3] = _summarize(1, iouThr=.3, areaRng='large', maxDets=self.params.maxDets[2])
             stats[4] = _summarize(0, iouThr=.3, maxDets=self.params.maxDets[0])
             stats[5] = _summarize(0, iouThr=.3, maxDets=self.params.maxDets[1])
-            stats[6] = _summarize(0, iouThr=.3, maxDets=self.params.maxDets[2])
+            stats[6] = _summarize(0, iouThr=.3, maxDets=self.params.maxDets[2], highlight=True)
             stats[7] = _summarize(0, iouThr=.3, areaRng='small', maxDets=self.params.maxDets[2])
             stats[8] = _summarize(0, iouThr=.3, areaRng='medium', maxDets=self.params.maxDets[2])
             stats[9] = _summarize(0, iouThr=.3, areaRng='large', maxDets=self.params.maxDets[2])
@@ -484,7 +496,7 @@ class Params:
 
     def setDetParams(self):
         self.setBasicParams()
-        self.maxDets = [1, 10, 100]
+        self.maxDets = [1, 10, 400]  # [1, 10, 100]
         self.areaRng = [[0 ** 2, 1e5 ** 2], [0 ** 2, 32 ** 2], [32 ** 2, 96 ** 2], [96 ** 2, 1e5 ** 2]]
         self.areaRngLbl = ['all', 'small', 'medium', 'large']
 
