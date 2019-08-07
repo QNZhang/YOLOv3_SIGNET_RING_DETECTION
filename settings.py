@@ -16,7 +16,7 @@ SIGNET_TRAIN_NEG_IMG_PATH = os.path.join(
 SIGNET_TRAIN_POS_IMG_PATH = os.path.join(
     DIGEST_PATH_2019_PATH, 'digestPath', 'Signet_ring_cell_dataset', 'sig-train-pos')
 
-SIGNET_BOUNDING_BOXES_PATH = os.path.join(DIGEST_PATH_2019_PATH, 'python_app', 'data', 'signet_bounding_boxes.txt')
+SIGNET_BOUNDING_BOXES_PATH = os.path.join(DIGEST_PATH_2019_PATH, 'python_app', 'data', 'signet_bounding_boxes.pickle')
 # serialized list
 SIGNET_TRAIN_PATH = os.path.join(DIGEST_PATH_2019_PATH, 'python_app', 'data', 'signet_train.pickle')
 # serialized list
