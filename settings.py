@@ -18,9 +18,9 @@ SIGNET_TRAIN_POS_IMG_PATH = os.path.join(
 
 SIGNET_BOUNDING_BOXES_PATH = os.path.join(DIGEST_PATH_2019_PATH, 'python_app', 'data', 'signet_bounding_boxes.pickle')
 # serialized list
-SIGNET_TRAIN_PATH = os.path.join(DIGEST_PATH_2019_PATH, 'python_app', 'data', 'signet_train.pickle')
+SIGNET_TRAIN_PATH = os.path.join(DIGEST_PATH_2019_PATH, 'python_app', 'data', 'test size 0.2', 'signet_train.pickle')
 # serialized list
-SIGNET_TEST_PATH = os.path.join(DIGEST_PATH_2019_PATH, 'python_app', 'data', 'signet_test.pickle')
+SIGNET_TEST_PATH = os.path.join(DIGEST_PATH_2019_PATH, 'python_app', 'data', 'test size 0.2',  'signet_test.pickle')
 
 ###############################################################################
 #                                   Evaluation
