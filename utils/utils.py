@@ -3,13 +3,17 @@
 
 from __future__ import division
 
-import torch
-import numpy as np
 import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from sklearn.cluster import KMeans
+import torch
 
 from constants import Dataset
 from core.exceptions import DatasetIdInvalid
 import settings
+from utils.managers.signet_ring_cell_dataset import SignetRingMGR
 
 
 def nms(bbox, thresh, score=None, limit=None):
@@ -385,3 +389,102 @@ def get_tensorboard_log_path(option):
     }
 
     return log_paths[option]
+
+
+def recalculate_anchor_boxes(option, plot_charts=False, round_centroid_values=True):
+    """
+    Recalculates and returns the 9 anchor boxes to be used by YOLOv3
+    Inspired on: https://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_digits.html
+    Returns numpy.ndarray [9, 2]
+    """
+    if not Dataset.is_valid_option(option):
+        raise DatasetIdInvalid()
+
+    if option == Dataset.COCO:
+        # TODO: IMPLEMENT ANCHOR BOXES RECALCULATION FOR COCO
+        raise NotImplementedError(
+            'Recalculation of anchor boxes for COCO has not been implemented yet.')
+
+    if option == Dataset.SIGNET_RING:
+        mgr = SignetRingMGR(settings.SIGNET_BOUNDING_BOXES_PATH)
+        boundingboxes_dimentions = tuple([
+            (bbox.width, bbox.height) for bbox in mgr.get_annotations(mgr.get_img_ids())])
+        kmeans = KMeans(n_clusters=9, random_state=42).fit(boundingboxes_dimentions)
+        boundingboxes_dimentions = np.array(boundingboxes_dimentions)
+        x_min, y_min = boundingboxes_dimentions[:, 0].min() - 1, \
+            boundingboxes_dimentions[:, 1].min() - 1
+        x_max, y_max = boundingboxes_dimentions[:, 0].max() + 1, \
+            boundingboxes_dimentions[:, 1].max() + 1
+        h = 0.2
+        xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+        # Obtain labels for each point in mesh. Use last trained model.
+        Z = kmeans.predict(np.c_[xx.ravel(), yy.ravel()])
+        # Put the result into a color plot
+        Z = Z.reshape(xx.shape)
+        centroids = kmeans.cluster_centers_
+
+        if round_centroid_values:
+            centroids = np.array(list(map(
+                lambda x: [int(round(x[0])), int(round(x[1]))],
+                centroids
+            )))
+
+        if not plot_charts:
+            return centroids
+
+        fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=[14, 9])
+
+        fig.suptitle('K-means clustering on Signet Ring dataset\n'
+                     'Centroids are marked with white cross', fontsize=20)
+
+        ax1.imshow(Z, interpolation='nearest',
+                   extent=(xx.min(), xx.max(), yy.min(), yy.max()),
+                   cmap=plt.cm.Paired,
+                   aspect='auto', origin='lower')
+        # Plot the centroids as a white X
+        ax1.scatter(centroids[:, 0], centroids[:, 1],
+                    marker='x', s=169, linewidths=3,
+                    color='r', zorder=10)
+        ax1.set_xlim(x_min, x_max)
+        ax1.set_ylim(y_min, y_max)
+        ax1.set_xticklabels(())
+        ax1.set_yticklabels(())
+        ax1.set_xlabel('Bounding box width')
+        ax1.set_ylabel('Bounding box height')
+
+        ax2.imshow(Z, interpolation='nearest',
+                   extent=(xx.min(), xx.max(), yy.min(), yy.max()),
+                   cmap=plt.cm.Paired,
+                   aspect='auto', origin='lower')
+
+        ax2.plot(boundingboxes_dimentions[:, 0], boundingboxes_dimentions[:, 1], 'k.', markersize=2)
+        # Plot the centroids as a white X
+        ax2.scatter(centroids[:, 0], centroids[:, 1],
+                    marker='x', s=169, linewidths=3,
+                    color='w', zorder=10)
+
+        ax2.set_xlim(x_min, x_max)
+        ax2.set_ylim(y_min, y_max)
+        ax2.set_xticklabels(())
+        ax2.set_yticklabels(())
+        ax2.set_xlabel('Bounding box width')
+        ax2.set_ylabel('Bounding box height')
+
+        # ax3.hist(kmeans.predict(boundingboxes_dimentions), 9, density=True,
+        #          facecolor='g', alpha=0.7, edgecolor='black', linewidth=1,
+        #          orientation='horizontal')
+        # ax3.grid(True)
+        # ax3.set_xlabel('Probability')
+        # ax3.set_ylabel('Bins')
+
+        pp = pd.DataFrame({'Prediction': kmeans.predict(boundingboxes_dimentions)})
+        pp['Prediction'].hist(ax=ax3, grid=True, bins=9)
+
+        plt.tight_layout()
+        # Make space for title
+        plt.subplots_adjust(top=0.85)
+        plt.show()
+
+        return centroids
+
+    raise NotImplementedError

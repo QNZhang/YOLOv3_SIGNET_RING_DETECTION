@@ -4,6 +4,7 @@
 import os
 
 from constants import Dataset
+from utils.utils import recalculate_anchor_boxes
 
 
 def main():
@@ -13,7 +14,7 @@ def main():
     # os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard True --checkpoint_interval=500 --eval_interval=50')
     # os.system('python train.py --tfboard True --checkpoint_interval=500 --eval_interval=50 --checkpoint "checkpoints/test size 0.33/snapshot1500.ckpt"')
 
-    os.system('python train.py --cfg config/yolov3_eval_digestpath.cfg --eval_interval 1 --checkpoint "checkpoints/test size 0.33/snapshot500.ckpt"')
+    # os.system('python train.py --cfg config/yolov3_eval_digestpath.cfg --eval_interval 1 --checkpoint "checkpoints/test size 0.33/snapshot500.ckpt"')
     # os.system('python train.py --cfg config/yolov3_eval_digestpath.cfg --eval_interval 1 --weights_path weights/yolov3.weights')
     # os.system('python train.py --cfg config/yolov3_eval_digestpath.cfg --eval_interval 1 --weights_path weights/darknet53.conv.74 ')
 
@@ -28,3 +29,14 @@ def main():
 
 if __name__ == '__main__':
     main()
+    # a = recalculate_anchor_boxes(Dataset.SIGNET_RING, plot_charts=True, round_centroid_values=True)
+    # print(a)
+# [[ 54  47] S
+#  [113 114] L
+#  [ 88  70] L
+#  [ 71  47] M
+#  [ 59  80] M
+#  [ 65  62] M
+#  [ 40  41] S
+#  [ 46  60] S
+#  [ 81  96]] L
