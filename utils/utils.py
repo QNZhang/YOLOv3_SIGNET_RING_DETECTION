@@ -2,6 +2,7 @@
 """ utils/utils """
 
 from __future__ import division
+import os
 
 import cv2
 import matplotlib.pyplot as plt
@@ -9,11 +10,13 @@ import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 import torch
+import xml.etree.ElementTree as ET
 
 from constants import Dataset
 from core.exceptions import DatasetIdInvalid
 import settings
 from utils.managers.signet_ring_cell_dataset import SignetRingMGR
+from .kmeans_iou import kmeans, avg_iou
 
 
 def nms(bbox, thresh, score=None, limit=None):
@@ -486,5 +489,50 @@ def recalculate_anchor_boxes(option, plot_charts=False, round_centroid_values=Tr
         plt.show()
 
         return centroids
+
+    raise NotImplementedError
+
+
+def recalculate_anchor_boxes_kmeans_iou(option, print_results=False, num_centroids=9):
+    """
+    Recalculates and returns the 9 anchor boxes to be used by YOLOv3
+    Inspired on: https://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_digits.html
+    Returns numpy.ndarray [9, 2]
+
+    Inspired on: https://github.com/lars76/kmeans-anchor-boxes/blob/master/example.py
+    """
+    bndboxes = list()
+
+    if option == Dataset.COCO:
+        # TODO: IMPLEMENT ANCHOR BOXES RECALCULATION FOR COCO
+        raise NotImplementedError(
+            'Recalculation of anchor boxes for COCO has not been implemented yet.')
+
+    if option == Dataset.SIGNET_RING:
+        for xml_file in tuple(
+                filter(lambda x: x.endswith('.xml'), os.listdir(settings.SIGNET_TRAIN_POS_IMG_PATH))):
+            root = ET.parse(os.path.join(settings.SIGNET_TRAIN_POS_IMG_PATH, xml_file)).getroot()
+            size = root.find('./size')
+            height, width = int(size.find('height').text), int(size.find('width').text)
+
+            for object_ in root.findall('./object'):
+                xmin = int(object_.findtext('bndbox/xmin'))  # / width
+                ymin = int(object_.findtext('bndbox/ymin'))  # / height
+                xmax = int(object_.findtext('bndbox/xmax'))  # / width
+                ymax = int(object_.findtext('bndbox/ymax'))  # / height
+
+                bndboxes.append([xmax - xmin, ymax - ymin])
+
+        bndboxes = np.array(bndboxes)
+        new_anchors = kmeans(bndboxes, k=num_centroids)
+
+        if print_results:
+            print("Accuracy: {:.2f}%".format(avg_iou(bndboxes, new_anchors) * 100))
+            print("Boxes:\n {}".format(new_anchors))
+
+            ratios = np.around(new_anchors[:, 0] / new_anchors[:, 1], decimals=2).tolist()
+            print("Ratios:\n {}".format(sorted(ratios)))
+
+        return new_anchors
 
     raise NotImplementedError
