@@ -5,6 +5,9 @@ weights
 # emacs files
 *~
 
+# pickle files generated
+data/pickle_files
+
 # tensorboard logs
 tensorboard_logs
 
@@ -13,6 +16,9 @@ checkpoints
 
 # shell logs
 shell_logs
+
+# virtualenv
+env
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

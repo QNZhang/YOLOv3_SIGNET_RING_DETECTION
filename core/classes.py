@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-core/classes
-
-TODO: remove this files after merging with python_app
-"""
+""" core/classes """
 
 from collections import namedtuple
 

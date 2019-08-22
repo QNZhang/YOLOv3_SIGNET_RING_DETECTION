@@ -5,6 +5,9 @@ import os
 
 from constants import Dataset
 from utils.utils import recalculate_anchor_boxes, recalculate_anchor_boxes_kmeans_iou
+from utils.data import get_or_create_bndbox_dict, get_or_create_train_test_files, \
+    create_bndbox_file
+from utils.plot_tools import plot_img_plus_bounding_boxes
 
 
 def main():
@@ -12,7 +15,7 @@ def main():
     # os.system('python demo.py --cfg config/yolov3_default.cfg --image data/mountain.png --detect_thresh 0.5 --weights_path weights/yolov3.weights --dataset={}'.format(Dataset.COCO))
 
     # os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard True --checkpoint_interval=500 --eval_interval=50')
-    os.system('python train.py --tfboard True --checkpoint_interval=500 --eval_interval=50 --checkpoint "checkpoints/snapshot2500.ckpt"')
+    # os.system('python train.py --tfboard True --checkpoint_interval=500 --eval_interval=50 --checkpoint "checkpoints/snapshot2500.ckpt"')
 
     # os.system('python train.py --cfg config/yolov3_eval_digestpath.cfg --eval_interval 1 --checkpoint "checkpoints/test size 0.33/snapshot500.ckpt"')
     # os.system('python train.py --cfg config/yolov3_eval_digestpath.cfg --eval_interval 1 --weights_path weights/yolov3.weights')
@@ -20,15 +23,29 @@ def main():
 
     # os.system('python demo.py --image "/home/giussepi/Public/link/environments/challenges/digestpath_2019/digestPath/Signet_ring_cell_dataset/sig-train-pos/2018_69188_1-1_2019-03-14 23_40_58-lv0-47611-63515-2072-2046.jpeg" --detect_thresh 0.4 --weights weights/yolov3.weights')
     # os.system('python demo.py --image "/home/giussepi/Public/link/environments/challenges/digestpath_2019/digestPath/Signet_ring_cell_dataset/sig-train-pos/2018_69188_1-1_2019-03-14 23_40_58-lv0-47611-63515-2072-2046.jpeg" --detect_thresh 0.5 --ckpt checkpoints/snapshot1000.ckpt')
+    os.system('python demo.py --image "/home/giussepi/Public/link/environments/challenges/digestpath_2019/digestPath/Signet_ring_cell_dataset/sig-train-pos-sliced/2018_64982_1-3_2019-02-25_21_57_36-lv0-33516-59515-2003-2010_0_0.jpeg" --detect_thresh 0.4 --ckpt checkpoints/snapshot3000.ckpt')
     # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     # smallest
     # os.system('python demo.py --image "/home/giussepi/Public/link/environments/challenges/digestpath_2019/digestPath/Signet_ring_cell_dataset/sig-train-pos/G1900703-2_2019-04-30 09_53_59-lv0-21164-5136-2060-2007.jpeg" --detect_thresh 0.45 --ckpt "checkpoints/test size 0.2/snapshot500.ckpt"')
     # random image
     # os.system('python demo.py --image "/home/giussepi/Public/link/environments/challenges/digestpath_2019/digestPath/Signet_ring_cell_dataset/sig-train-pos/2018_69188_1-1_2019-03-14 23_40_58-lv0-47611-63515-2072-2046.jpeg" --detect_thresh 0.45 --ckpt "checkpoints/test size 0.2/snapshot500.ckpt"')
 
+    ###############################################################################
+    # bndbox_dictionary = get_or_create_bndbox_dict(force_create=True)
+    # plot_img_plus_bounding_boxes('2018_68000_1-8_2019-02-26 02_28_01-lv0-83128-38504-2005-2016.jpeg')
+    # train, test = get_or_create_train_test_files()
+    # plot_img_plus_bounding_boxes('G1900703-2_2019-04-30 09_53_59-lv0-21164-5136-2060-2007.jpeg')
+    # plot_img_plus_bounding_boxes('2018_64982_1-3_2019-02-25_21_57_36-lv0-33516-59515-2003-2010_0_0.jpeg')
+    ###############################################################################
+
 
 if __name__ == '__main__':
     main()
+    ###############################################################################
+    # train, test = get_or_create_train_test_files(test_size=0.2, force_create=True)
+    # bbox = test[list(test.keys())[0]][0]
+    # print(bbox.area, bbox.id)
+    ###############################################################################
     # a = recalculate_anchor_boxes(Dataset.SIGNET_RING, plot_charts=True, round_centroid_values=True)
     # print(a)
     # [[ 54  47] S
