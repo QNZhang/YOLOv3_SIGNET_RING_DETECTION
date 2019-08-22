@@ -11,8 +11,8 @@ def main():
     """  """
     # os.system('python demo.py --cfg config/yolov3_default.cfg --image data/mountain.png --detect_thresh 0.5 --weights_path weights/yolov3.weights --dataset={}'.format(Dataset.COCO))
 
-    os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard True --checkpoint_interval=500 --eval_interval=50')
-    # os.system('python train.py --tfboard True --checkpoint_interval=500 --eval_interval=50 --checkpoint "checkpoints/test size 0.33/snapshot1500.ckpt"')
+    # os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard True --checkpoint_interval=500 --eval_interval=50')
+    os.system('python train.py --tfboard True --checkpoint_interval=500 --eval_interval=50 --checkpoint "checkpoints/snapshot2500.ckpt"')
 
     # os.system('python train.py --cfg config/yolov3_eval_digestpath.cfg --eval_interval 1 --checkpoint "checkpoints/test size 0.33/snapshot500.ckpt"')
     # os.system('python train.py --cfg config/yolov3_eval_digestpath.cfg --eval_interval 1 --weights_path weights/yolov3.weights')
@@ -28,7 +28,7 @@ def main():
 
 
 if __name__ == '__main__':
-    # main()
+    main()
     # a = recalculate_anchor_boxes(Dataset.SIGNET_RING, plot_charts=True, round_centroid_values=True)
     # print(a)
     # [[ 54  47] S
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     #  [ 40  41] S
     #  [ 46  60] S
     #  [ 81  96]] L
-    a = recalculate_anchor_boxes_kmeans_iou(Dataset.SIGNET_RING, print_results=True)
+    # a = recalculate_anchor_boxes_kmeans_iou(Dataset.SIGNET_RING, print_results=True)
     # Accuracy: 85.04%
     # Boxes:
     # [[0.02179297 0.02423954]
@@ -93,3 +93,21 @@ if __name__ == '__main__':
     #  [75 62]] L
     # Ratios:
     #  [0.72, 0.85, 0.86, 0.99, 1.03, 1.04, 1.2, 1.21, 1.48]
+
+    # sliced
+    # 9 centroids
+    # Accuracy: 82.33%
+    # Boxes:
+    #     [
+    #         [25 50]
+    #         [42 44]
+    #         [46 29]
+    #         [44 66]
+    #         [53 54]
+    #         [62 42]
+    #         [62 72]
+    #         [72 57]
+    #         [87 88]
+    #     ]
+    # Ratios:
+    #     [0.5, 0.67, 0.86, 0.95, 0.98, 0.99, 1.26, 1.48, 1.59]

@@ -14,7 +14,7 @@ DIGEST_PATH_2019_PATH = '/home/giussepi/Public/link/environments/challenges/dige
 SIGNET_TRAIN_NEG_IMG_PATH = os.path.join(
     DIGEST_PATH_2019_PATH, 'digestPath', 'Signet_ring_cell_dataset', 'sig-train-neg')
 SIGNET_TRAIN_POS_IMG_PATH = os.path.join(
-    DIGEST_PATH_2019_PATH, 'digestPath', 'Signet_ring_cell_dataset', 'sig-train-pos')
+    DIGEST_PATH_2019_PATH, 'digestPath', 'Signet_ring_cell_dataset', 'sig-train-pos-sliced')
 
 SIGNET_BOUNDING_BOXES_PATH = os.path.join(DIGEST_PATH_2019_PATH, 'python_app', 'data', 'signet_bounding_boxes.pickle')
 # serialized list
@@ -27,7 +27,7 @@ SIGNET_TEST_PATH = os.path.join(DIGEST_PATH_2019_PATH, 'python_app', 'data', 'te
 ###############################################################################
 
 EVAL_LINEAR_SPACE_LOWER_BOUND = 0.3
-EVAL_LINEAR_SPACE_UPPER_BOUND = 0.95
+EVAL_LINEAR_SPACE_UPPER_BOUND = 0.3  # 0.95
 EVAL_LINEAR_SPACE_STEP = 0.05  # spacing between samples
 # XXX: After modifying these values, you must do the following updates:
 # utils/evaluators/detection_evaluators.py:SignetRingEval.summarize._summarizeDets

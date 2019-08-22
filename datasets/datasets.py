@@ -196,8 +196,6 @@ class SignetRing(Dataset):
         """
         id_ = self.ids[index]
 
-        # TODO: Review is in fact there are occluded objects in the database
-        # TODO: then filtering by occluded to see if results changes
         # anno_ids = self.coco.getAnnIds(imgIds=[int(id_)], iscrowd=None)
         # annotations = self.coco.loadAnns(anno_ids)
         annotations = self.signet.get_annotations(

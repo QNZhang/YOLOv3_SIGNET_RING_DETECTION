@@ -450,8 +450,8 @@ def recalculate_anchor_boxes(option, plot_charts=False, round_centroid_values=Tr
                     color='r', zorder=10)
         ax1.set_xlim(x_min, x_max)
         ax1.set_ylim(y_min, y_max)
-        ax1.set_xticklabels(())
-        ax1.set_yticklabels(())
+        # ax1.set_xticklabels(())
+        # ax1.set_yticklabels(())
         ax1.set_xlabel('Bounding box width')
         ax1.set_ylabel('Bounding box height')
 
@@ -468,8 +468,8 @@ def recalculate_anchor_boxes(option, plot_charts=False, round_centroid_values=Tr
 
         ax2.set_xlim(x_min, x_max)
         ax2.set_ylim(y_min, y_max)
-        ax2.set_xticklabels(())
-        ax2.set_yticklabels(())
+        # ax2.set_xticklabels(())
+        # ax2.set_yticklabels(())
         ax2.set_xlabel('Bounding box width')
         ax2.set_ylabel('Bounding box height')
 
