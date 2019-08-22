@@ -13,12 +13,49 @@ import settings
 from .files import get_name_and_extension
 
 
+def create_bndbox_file_from_file(file_path, output_file_name):
+    """
+    - Reads file_path and gets xml files names without extension (one name per line)
+    - Processes the xml files and creates a dictionary with the format:
+      key = image file name
+      value = [SignetBox(), SignetBox(), SignetBox(), ...]
+    - Uses pickle to save the dictionary in the file output_file_name at
+      settings.PICKLE_FILES_PATH directory
+    """
+    dir_path = os.path.dirname(settings.PICKLE_FILES_PATH)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+    bndbox_dictionary = defaultdict(list)
+    counter = 0
+
+    with open(file_path, 'r') as file_:
+        for file_name in file_:
+            file_name = file_name.strip()
+            root = ET.parse(os.path.join(settings.SIGNET_TRAIN_POS_IMG_PATH, file_name + ".xml")).getroot()
+            for bndbox in root.findall('./object'):
+                details = dict(
+                    pose=bndbox.find('pose').text,
+                    truncated=int(bndbox.find('truncated').text),
+                    occluded=int(bndbox.find('occluded').text),
+                    difficult=int(bndbox.find('difficult').text),
+                )
+
+                bnd_box = {elem.tag: float(elem.text) for elem in bndbox.find('bndbox').getchildren()}
+
+                counter += 1
+                bndbox_dictionary[file_name].append(SignetBox(counter, file_name, details, bnd_box))
+
+    with open(os.path.join(settings.PICKLE_FILES_PATH, output_file_name), 'wb') as file_:
+        file_.write(pickle.dumps(bndbox_dictionary))
+
+
 def create_bndbox_file():
     """
     - Processes the xml files and creates a dictionary with the format:
       key = image file name
       value = [SignetBox(), SignetBox(), SignetBox(), ...]
-    - Uses picle to save the dictionary in the file settings.SIGNET_BOUNDING_BOXES_PATH
+    - Uses pickle to save the dictionary in the file settings.SIGNET_BOUNDING_BOXES_PATH
     """
     dir_path = os.path.dirname(settings.SIGNET_BOUNDING_BOXES_PATH)
     if not os.path.exists(dir_path):
