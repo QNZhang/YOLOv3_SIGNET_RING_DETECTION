@@ -14,13 +14,14 @@ DIGEST_PATH_2019_PATH = '/home/giussepi/Public/link/environments/challenges/dige
 SIGNET_TRAIN_NEG_IMG_PATH = os.path.join(
     DIGEST_PATH_2019_PATH, 'digestPath', 'Signet_ring_cell_dataset', 'sig-train-neg')
 SIGNET_TRAIN_POS_IMG_PATH = os.path.join(
-    DIGEST_PATH_2019_PATH, 'digestPath', 'Signet_ring_cell_dataset', 'sig-train-pos-sliced')
+    DIGEST_PATH_2019_PATH, 'digestPath', 'Signet_ring_cell_dataset', 'sig-train-pos-sliced-xingru')
 
-SIGNET_BOUNDING_BOXES_PATH = os.path.join('data', 'pickle_files', 'signet_bounding_boxes.pickle')
+PICKLE_FILES_PATH = os.path.join('data', 'pickle_files')
+SIGNET_BOUNDING_BOXES_PATH = os.path.join(PICKLE_FILES_PATH, 'signet_bounding_boxes.pickle')
 # serialized list
-SIGNET_TRAIN_PATH = os.path.join('data', 'pickle_files', 'test size 0.2', 'signet_train.pickle')
+SIGNET_TRAIN_PATH = os.path.join(PICKLE_FILES_PATH, 'xingru_train.pickle')
 # serialized list
-SIGNET_TEST_PATH = os.path.join('data', 'pickle_files', 'test size 0.2',  'signet_test.pickle')
+SIGNET_TEST_PATH = os.path.join(PICKLE_FILES_PATH, 'xingru_val.pickle')
 
 ###############################################################################
 #                                   Evaluation
