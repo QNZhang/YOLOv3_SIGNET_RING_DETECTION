@@ -466,6 +466,11 @@ def recalculate_anchor_boxes(option, plot_charts=False, round_centroid_values=Tr
                     marker='x', s=169, linewidths=3,
                     color='w', zorder=10)
 
+        # # Plot new kmeans-IoU centroids
+        # ax2.scatter([25, 42, 46, 44, 53, 62, 62, 72, 87], [50, 44, 29, 66, 54, 42, 72, 57, 88],
+        #             marker='o', s=169, linewidths=3,
+        #             color='r', zorder=10)
+
         ax2.set_xlim(x_min, x_max)
         ax2.set_ylim(y_min, y_max)
         # ax2.set_xticklabels(())
