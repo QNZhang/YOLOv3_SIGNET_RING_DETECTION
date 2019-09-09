@@ -20,6 +20,9 @@ shell_logs
 # virtualenv
 env
 
+# configuration file
+settings.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
