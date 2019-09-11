@@ -14,7 +14,8 @@ def main():
     """  """
     # os.system('python demo.py --cfg config/yolov3_default.cfg --image data/mountain.png --detect_thresh 0.5 --weights_path weights/yolov3.weights --dataset={}'.format(Dataset.COCO))
 
-    # os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard True --checkpoint_interval=250 --eval_interval=50')
+    os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard True --checkpoint_interval=50 --eval_interval=50')
+
     # os.system('python train.py --tfboard True --checkpoint_interval=250 --eval_interval=50 --checkpoint "checkpoints/snapshot1500.ckpt"')
 
     #os.system('python train.py --cfg config/yolov3_eval_digestpath.cfg --eval_interval 1 --checkpoint "checkpoints/xingru new anchors non-normalizesd IOU kmeans/snapshot750.ckpt"')
@@ -43,11 +44,11 @@ def main():
 if __name__ == '__main__':
     main()
     ###############################################################################
-    # train, test = get_or_create_train_test_files(test_size=0.2, force_create=True)
+    # train, test = get_or_create_train_test_files(test_size=0.2, force_create=False)
     # bbox = test[list(test.keys())[0]][0]
     # print(bbox.area, bbox.id)
     ###############################################################################
-    a = recalculate_anchor_boxes(Dataset.SIGNET_RING, plot_charts=True, round_centroid_values=True)
+    # a = recalculate_anchor_boxes(Dataset.SIGNET_RING, plot_charts=True, round_centroid_values=True)
     # print(a)
     # [[ 54  47] S
     #  [113 114] L
@@ -129,3 +130,24 @@ if __name__ == '__main__':
     #     ]
     # Ratios:
     #     [0.5, 0.67, 0.86, 0.95, 0.98, 0.99, 1.26, 1.48, 1.59]
+    # recalculate_anchor_boxes_kmeans_iou(Dataset.SIGNET_RING, print_results=True, num_centroids=12)
+# Accuracy: 83.95%
+# Boxes:
+#     [
+#         [23, 51],
+#         [36, 30],
+#         [39, 54],
+#         [40, 40],
+
+#         [48, 47],
+#         [47, 69],
+#         [54, 23],
+#         [56, 55],
+
+#         [60, 40],
+#         [64, 72],
+#         [72, 55],
+#         [90, 90],
+#     ]
+# Ratios:
+#     [0.45, 0.68, 0.72, 0.89, 1.0, 1.0, 1.02, 1.02, 1.2, 1.31, 1.5, 2.35]
