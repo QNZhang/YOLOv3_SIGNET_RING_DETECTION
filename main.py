@@ -131,23 +131,75 @@ if __name__ == '__main__':
     # Ratios:
     #     [0.5, 0.67, 0.86, 0.95, 0.98, 0.99, 1.26, 1.48, 1.59]
     # recalculate_anchor_boxes_kmeans_iou(Dataset.SIGNET_RING, print_results=True, num_centroids=12)
-# Accuracy: 83.95%
-# Boxes:
-#     [
-#         [23, 51],
-#         [36, 30],
-#         [39, 54],
-#         [40, 40],
+    # Accuracy: 83.95%
+    # Boxes:
+    #     [
+    #         [23, 51],
+    #         [36, 30],
+    #         [39, 54],
+    #         [40, 40],
+    #         [48, 47],
+    #         [47, 69],
+    #         [54, 23],
+    #         [56, 55],
+    #         [60, 40],
+    #         [64, 72],
+    #         [72, 55],
+    #         [90, 90],
+    #     ]
+    # Ratios:
+    #     [0.45, 0.68, 0.72, 0.89, 1.0, 1.0, 1.02, 1.02, 1.2, 1.31, 1.5, 2.35]
 
-#         [48, 47],
-#         [47, 69],
-#         [54, 23],
-#         [56, 55],
+    # recalculate_anchor_boxes_kmeans_iou(Dataset.SIGNET_RING, print_results=True, num_centroids=15)
+    # Accuracy: 85.45%
+    # Boxes:
+    #     [
+    #         [22,  49],
+    #         [34,  64],
+    #         [37,  42],
+    #         [44,  29],
+    #         [44,  52],
+    #         [47,  70],
+    #         [50,  43],
+    #         [53,  57],
+    #         [61,  50],
+    #         [66,  36],
+    #         [61,  67],
+    #         [74,  56],
+    #         [67,  87],
+    #         [82,  73],
+    #         [98, 101],
+    #     ]
+    # Ratios:
+    #     [0.45, 0.53, 0.67, 0.77, 0.85, 0.88, 0.91, 0.93, 0.97, 1.12, 1.16, 1.22, 1.32, 1.52, 1.83]
 
-#         [60, 40],
-#         [64, 72],
-#         [72, 55],
-#         [90, 90],
-#     ]
-# Ratios:
-#     [0.45, 0.68, 0.72, 0.89, 1.0, 1.0, 1.02, 1.02, 1.2, 1.31, 1.5, 2.35]
+    # Accuracy: 82.02% - 512x512
+    # Boxes:
+    #     [
+    #         [27, 50],
+    #         [42, 40],
+    #         [42, 62],
+    #         [51, 24],
+    #         [52, 51],
+    #         [58, 72],
+    #         [64, 41],
+    #         [69, 58],
+    #         [85, 86],
+    #     ]
+    # Ratios:
+    #     [0.54, 0.68, 0.81, 0.99, 1.02, 1.05, 1.19, 1.56, 2.12]
+
+    # Some negative images with detections
+
+    # jpegs = os.listdir(settings.SIGNET_TRAIN_NEG_IMG_PATH)
+    # jpegs = list(filter(lambda x: x.endswith('.jpeg'), jpegs))
+
+    # for file_ in jpegs:
+    #     path = os.path.join(settings.SIGNET_TRAIN_NEG_IMG_PATH, file_)
+    #     os.system('python demo.py --image "{}" --detect_thresh 0.45 --ckpt "checkpoints/logs_test_size_0_2_512x512/snapshot3800.ckpt"'.format(path))
+
+    # /media/giussepi/xingru_dev/Signet_ring_cell_dataset/sig-train-neg-sliced-512-sample/D20190112103_2019-06-10_16_28_08-lv0-29630-6271-2000-2000_1228.8_1228.8.jpeg
+    # /media/giussepi/xingru_dev/Signet_ring_cell_dataset/sig-train-neg-sliced-512-sample/D20190441404_2019-06-10_10_16_57-lv0-23312-22369-2000-2000_1228.8_1024.0.jpeg
+    # /media/giussepi/xingru_dev/Signet_ring_cell_dataset/sig-train-neg-sliced-512-sample/2019-32176-1-1-1_2019-05-28_11_43_23-lv0-75186-37075-2000-2000_0_1488.jpeg
+    # /media/giussepi/xingru_dev/Signet_ring_cell_dataset/sig-train-neg-sliced-512-sample/2019-32177-1-1-1_2019-05-28_11_36_01-lv0-69099-28446-2000-2000_614.4000000000001_1024.0.jpeg
+    # /media/giussepi/xingru_dev/Signet_ring_cell_dataset/sig-train-neg-sliced-512-sample/2019-06-11_14_33_26-lv0-34466-8170-2000-2000_819.2_1228.8.jpeg
