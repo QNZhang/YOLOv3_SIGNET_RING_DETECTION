@@ -15,7 +15,6 @@ def main():
     # os.system('python demo.py --cfg config/yolov3_default.cfg --image data/mountain.png --detect_thresh 0.5 --weights_path weights/yolov3.weights --dataset={}'.format(Dataset.COCO))
 
     os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard True --checkpoint_interval=50 --eval_interval=50')
-
     # os.system('python train.py --tfboard True --checkpoint_interval=250 --eval_interval=50 --checkpoint "checkpoints/snapshot1500.ckpt"')
 
     #os.system('python train.py --cfg config/yolov3_eval_digestpath.cfg --eval_interval 1 --checkpoint "checkpoints/xingru new anchors non-normalizesd IOU kmeans/snapshot750.ckpt"')
@@ -203,3 +202,37 @@ if __name__ == '__main__':
     # /media/giussepi/xingru_dev/Signet_ring_cell_dataset/sig-train-neg-sliced-512-sample/2019-32176-1-1-1_2019-05-28_11_43_23-lv0-75186-37075-2000-2000_0_1488.jpeg
     # /media/giussepi/xingru_dev/Signet_ring_cell_dataset/sig-train-neg-sliced-512-sample/2019-32177-1-1-1_2019-05-28_11_36_01-lv0-69099-28446-2000-2000_614.4000000000001_1024.0.jpeg
     # /media/giussepi/xingru_dev/Signet_ring_cell_dataset/sig-train-neg-sliced-512-sample/2019-06-11_14_33_26-lv0-34466-8170-2000-2000_819.2_1228.8.jpeg
+
+    ###############################################################################
+    # FIRST EXPERIMENTS USING POS AND NEG IMAGES
+    ###############################################################################
+    # /home/giussepi/Public/environments/challenges/digestpath_2019/env/lib/python3.6/site-packages/numpy/core/fromnumeric.py:86: RuntimeWarning: overflow encountered in reduce
+    #   return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+    # /media/giussepi/Samsung_T5/Desktop info/Public/environments/challenges/digestpath_2019/python_app/third_party/PyTorch_YOLOv3/utils/utils.py:56: RuntimeWarning: invalid value encountered in subtract
+    #   iou = area / (bbox_area[i] + bbox_area[selec] - area)
+    # /media/giussepi/Samsung_T5/Desktop info/Public/environments/challenges/digestpath_2019/python_app/third_party/PyTorch_YOLOv3/utils/utils.py:58: RuntimeWarning: invalid value encountered in greater_equal
+    #   if (iou >= thresh).any():
+    # /media/giussepi/Samsung_T5/Desktop info/Public/environments/challenges/digestpath_2019/python_app/third_party/PyTorch_YOLOv3/utils/utils.py:56: RuntimeWarning: overflow encountered in add
+    #   iou = area / (bbox_area[i] + bbox_area[selec] - area)
+    # /media/giussepi/Samsung_T5/Desktop info/Public/environments/challenges/digestpath_2019/python_app/third_party/PyTorch_YOLOv3/utils/utils.py:56: RuntimeWarning: invalid value encountered in true_divide
+    #   iou = area / (bbox_area[i] + bbox_area[selec] - area)
+    # /home/giussepi/Public/environments/challenges/digestpath_2019/env/lib/python3.6/site-packages/numpy/core/fromnumeric.py:86: RuntimeWarning: invalid value encountered in reduce
+    #   return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+    # /media/giussepi/Samsung_T5/Desktop info/Public/environments/challenges/digestpath_2019/python_app/third_party/PyTorch_YOLOv3/utils/utils.py:55: RuntimeWarning: invalid value encountered in multiply
+    #   area = np.prod(br - tl, axis=1) * (tl < br).all(axis=1)
+    # Running per image evaluation...
+    # Evaluate annotation type *bbox*
+    # DONE (t=13.40s).
+    # Accumulating evaluation results...
+    # DONE (t=0.83s).
+    #  Average Precision  (AP) @[ IoU=0.30      | area=   all | maxDets=400 ] = 0.005
+    #  Average Precision  (AP) @[ IoU=0.30      | area= small | maxDets=400 ] = 0.000
+    #  Average Precision  (AP) @[ IoU=0.30      | area=medium | maxDets=400 ] = 0.011
+    #  Average Precision  (AP) @[ IoU=0.30      | area= large | maxDets=400 ] = 0.001
+    #  Average Recall     (AR) @[ IoU=0.30      | area=   all | maxDets=  1 ] = 0.003
+    #  Average Recall     (AR) @[ IoU=0.30      | area=   all | maxDets= 10 ] = 0.023
+    #  Average Recall     (AR) @[ IoU=0.30      | area=   all | maxDets=400 ] = 0.563
+    #  Average Recall     (AR) @[ IoU=0.30      | area= small | maxDets=400 ] = 0.074
+    #  Average Recall     (AR) @[ IoU=0.30      | area=medium | maxDets=400 ] = 0.574
+    #  Average Recall     (AR) @[ IoU=0.30      | area= large | maxDets=400 ] = 0.976
+    # [Iter 50/3500] [lr 0.000000] [Losses: xy 8.029614, wh 11.818830, conf 15137.181641, cls 5.940384, total 5562.636230, imgsize 384]

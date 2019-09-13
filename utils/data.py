@@ -56,6 +56,7 @@ def create_bndbox_file():
       key = image file name
       value = [SignetBox(), SignetBox(), SignetBox(), ...]
     - Uses pickle to save the dictionary in the file settings.SIGNET_BOUNDING_BOXES_PATH
+    - Supports negative images (images without annotations)
     """
     dir_path = os.path.dirname(settings.SIGNET_BOUNDING_BOXES_PATH)
     if not os.path.exists(dir_path):
@@ -66,20 +67,24 @@ def create_bndbox_file():
 
     for xml_file in tuple(
             filter(lambda x: x.endswith('.xml'), os.listdir(settings.SIGNET_TRAIN_POS_IMG_PATH))):
-        root = ET.parse(os.path.join(settings.SIGNET_TRAIN_POS_IMG_PATH, xml_file)).getroot()
         img_id, _ = get_name_and_extension(xml_file)
-        for bndbox in root.findall('./object'):
-            details = dict(
-                pose=bndbox.find('pose').text,
-                truncated=int(bndbox.find('truncated').text),
-                occluded=int(bndbox.find('occluded').text),
-                difficult=int(bndbox.find('difficult').text),
-            )
+        try:
+            root = ET.parse(os.path.join(settings.SIGNET_TRAIN_POS_IMG_PATH, xml_file)).getroot()
+        except ET.ParseError:
+            bndbox_dictionary[img_id].clear()
+        else:
+            for bndbox in root.findall('./object'):
+                details = dict(
+                    pose=bndbox.find('pose').text,
+                    truncated=int(bndbox.find('truncated').text),
+                    occluded=int(bndbox.find('occluded').text),
+                    difficult=int(bndbox.find('difficult').text),
+                )
 
-            bnd_box = {elem.tag: float(elem.text) for elem in bndbox.find('bndbox').getchildren()}
+                bnd_box = {elem.tag: float(elem.text) for elem in bndbox.find('bndbox').getchildren()}
 
-            counter += 1
-            bndbox_dictionary[img_id].append(SignetBox(counter, img_id, details, bnd_box))
+                counter += 1
+                bndbox_dictionary[img_id].append(SignetBox(counter, img_id, details, bnd_box))
 
     with open(settings.SIGNET_BOUNDING_BOXES_PATH, 'wb') as file_:
         file_.write(pickle.dumps(bndbox_dictionary))
