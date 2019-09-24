@@ -27,3 +27,7 @@ settings.py
 __pycache__/
 *.py[cod]
 *$py.class
+
+# input and output folders
+input
+output
