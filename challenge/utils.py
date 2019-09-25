@@ -33,7 +33,7 @@ def use_cuda():
     return torch.cuda.is_available() and settings.USE_CUDA
 
 
-def generate_save_xml(predictions, filepath):
+def generate_save_xml(predictions, fileimg, img_width, img_height):
     """
     Saves the predicitons into an xml file similar to training XML files annotations
     """
@@ -56,12 +56,33 @@ def generate_save_xml(predictions, filepath):
             }
         }
 
-    with open(filepath, 'a') as file_:
+    with open(
+            os.path.join(settings.OUTPUT_FOLDER, fileimg.replace(".jpeg", '.xml')),
+            'a'
+    ) as file_:
+        file_.write('<annotation>\n')
+        file_.write(' <folder>annotations</folder>\n')
+        file_.write(' <filename>{}</filename>\n'.format(fileimg))
+        file_.write(' <source>\n')
+        file_.write('  <database>The Ring Cell Database</database>\n')
+        file_.write('  <annotation>Ring Cell Dataset</annotation>\n')
+        file_.write('  <image>flickr</image>\n')
+        file_.write(' </source>\n')
+        file_.write(' <size>\n')
+        file_.write('  <width>{}</width>\n'.format(img_width))
+        file_.write('  <height>{}</height>\n'.format(img_height))
+        file_.write('  <depth>3</depth>\n')
+        file_.write(' </size>\n')
+        file_.write(' <segmented>0</segmented>\n')
+
+        # creating bounding boxes
         for prediction in predictions:
-            file_.write(xmltodict.unparse(
+            file_.write(' ' + xmltodict.unparse(
                 get_object_dict(*prediction), pretty=True, full_document=False,
                 newl="\n", indent=" "
             ) + '\n')
+
+        file_.write('</annotation>')
 
 
 def evaluation(x, y, cut_size, w, h, fimg, model):
@@ -145,10 +166,7 @@ def process_input_files(model, create_save_img_predictions=False, draw_annotatio
         predictions = predictions[selected_ids]
 
         print('saving xml')
-        generate_save_xml(
-            predictions,
-            os.path.join(settings.OUTPUT_FOLDER, fileimg.replace(".jpeg", '.xml'))
-        )
+        generate_save_xml(predictions, fileimg, fimg.width, fimg.height)
 
         if create_save_img_predictions:
             print('saving jpeg')
