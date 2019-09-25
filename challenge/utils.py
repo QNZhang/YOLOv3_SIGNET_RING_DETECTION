@@ -33,6 +33,37 @@ def use_cuda():
     return torch.cuda.is_available() and settings.USE_CUDA
 
 
+def generate_save_xml(predictions, filepath):
+    """
+    Saves the predicitons into an xml file similar to training XML files annotations
+    """
+    def get_object_dict(xmin, ymin, xmax, ymax, confidence):
+        """  """
+        return {
+            'object': {
+                'name': 'ring_cell_cancer',
+                'pose': 'Right',
+                'truncated': 1,
+                'occluded': 0,
+                'confidence': confidence,
+                'bndbox': {
+                    'xmin': xmin,
+                    'ymin': ymin,
+                    'xmax': xmax,
+                    'ymax': ymax,
+                },
+                'difficult': 0
+            }
+        }
+
+    with open(filepath, 'a') as file_:
+        for prediction in predictions:
+            file_.write(xmltodict.unparse(
+                get_object_dict(*prediction), pretty=True, full_document=False,
+                newl="\n", indent=" "
+            ) + '\n')
+
+
 def evaluation(x, y, cut_size, w, h, fimg, model):
     """  """
     fimg = cv2.imread(fimg.filename)
@@ -59,8 +90,8 @@ def evaluation(x, y, cut_size, w, h, fimg, model):
 
     while(i < c.shape[0]):
         c[i, 0] += x
-        c[i, 2] += x
         c[i, 1] += y
+        c[i, 2] += x
         c[i, 3] += y
         i += 1
 
@@ -113,9 +144,12 @@ def process_input_files(model, draw_annotations=False):
         selected_ids = nms(predictions[:, :4], model.nmsthre, predictions[:, 4])
         predictions = predictions[selected_ids]
 
-        print('saving txt')
-        np.savetxt(
-            os.path.join(settings.OUTPUT_FOLDER, fileimg.replace(".jpeg", '.txt')), predictions)
+        print('saving xml')
+        generate_save_xml(
+            predictions,
+            os.path.join(settings.OUTPUT_FOLDER, fileimg.replace(".jpeg", '.xml'))
+        )
+
         print('saving jpeg')
         draw = ImageDraw.Draw(fimg)
         i = 1
