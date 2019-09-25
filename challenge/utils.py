@@ -12,6 +12,7 @@ import xmltodict
 from PIL import Image, ImageDraw
 
 from . import settings
+from utils.utils import nms
 
 
 def initial_validation_cleaning():
@@ -108,6 +109,10 @@ def process_input_files(model, draw_annotations=False):
             predictions = np.vstack((predictions, eval_results))
 
         predictions = np.delete(predictions, 0, axis=0)
+
+        selected_ids = nms(predictions[:, :4], model.nmsthre, predictions[:, 4])
+        predictions = predictions[selected_ids]
+
         print('saving txt')
         np.savetxt(
             os.path.join(settings.OUTPUT_FOLDER, fileimg.replace(".jpeg", '.txt')), predictions)
