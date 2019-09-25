@@ -98,7 +98,7 @@ def evaluation(x, y, cut_size, w, h, fimg, model):
     return c
 
 
-def process_input_files(model, draw_annotations=False):
+def process_input_files(model, create_save_img_predictions=False, draw_annotations=False):
     """  """
     for fileimg in tuple(filter(lambda x: x.endswith('.jpeg'), os.listdir(settings.INPUT_FOLDER))):
         print(fileimg)
@@ -150,30 +150,32 @@ def process_input_files(model, draw_annotations=False):
             os.path.join(settings.OUTPUT_FOLDER, fileimg.replace(".jpeg", '.xml'))
         )
 
-        print('saving jpeg')
-        draw = ImageDraw.Draw(fimg)
-        i = 1
+        if create_save_img_predictions:
+            print('saving jpeg')
+            draw = ImageDraw.Draw(fimg)
+            i = 1
 
-        while(i < predictions.shape[0]):
-            colors = int(255*predictions[i, 4])
-            draw.rectangle(predictions[i, 0:4].tolist(), outline=(colors, colors, colors))
-            i += 1
+            while(i < predictions.shape[0]):
+                colors = int(255*predictions[i, 4])
+                draw.rectangle(predictions[i, 0:4].tolist(), outline=(colors, colors, colors))
+                i += 1
 
-        annotations_path = os.path.join(settings.INPUT_FOLDER, fileimg.replace("jpeg", "xml"))
-        if draw_annotations and os.path.exists(annotations_path):
-            with open(annotations_path) as fd:
-                doc = xmltodict.parse(fd.read(), dict_constructor=dict)
-                doc1 = deepcopy(doc)
-                obj = len(doc1['annotation']['object'])-1
+            annotations_path = os.path.join(settings.INPUT_FOLDER, fileimg.replace("jpeg", "xml"))
+            if draw_annotations and os.path.exists(annotations_path):
+                with open(annotations_path) as fd:
+                    doc = xmltodict.parse(fd.read(), dict_constructor=dict)
+                    doc1 = deepcopy(doc)
+                    obj = len(doc1['annotation']['object'])-1
 
-                while(obj != -1):
-                    bx1 = int(doc1['annotation']['object'][obj]['bndbox']['xmin'])
-                    by1 = int(doc1['annotation']['object'][obj]['bndbox']['ymin'])
-                    bx2 = int(doc1['annotation']['object'][obj]['bndbox']['xmax'])
-                    by2 = int(doc1['annotation']['object'][obj]['bndbox']['ymax'])
-                    draw.rectangle([bx1, by1, bx2, by2], outline=(0, 255, 0))
-                    obj -= 1
+                    while(obj != -1):
+                        bx1 = int(doc1['annotation']['object'][obj]['bndbox']['xmin'])
+                        by1 = int(doc1['annotation']['object'][obj]['bndbox']['ymin'])
+                        bx2 = int(doc1['annotation']['object'][obj]['bndbox']['xmax'])
+                        by2 = int(doc1['annotation']['object'][obj]['bndbox']['ymax'])
+                        draw.rectangle([bx1, by1, bx2, by2], outline=(0, 255, 0))
+                        obj -= 1
 
-        fimg.save(os.path.join(settings.OUTPUT_FOLDER, fileimg))
+            fimg.save(os.path.join(settings.OUTPUT_FOLDER, fileimg))
+
         fimg.close()
         print('done saving')
