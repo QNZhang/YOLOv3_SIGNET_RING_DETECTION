@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """ challenge classes """
 
-from copy import deepcopy
-from io import BytesIO
 import os
 
 import cv2
@@ -11,10 +9,6 @@ from torch.autograd import Variable
 import yaml
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.pylab as pylab
-import numpy as np
-import xmltodict
-from PIL import Image, ImageDraw
 
 
 from . import settings
@@ -54,9 +48,16 @@ class MyModel:
 
         self.model.eval()
 
-    def get_predictions(self, img_name, plot=False):
-        """  """
-        img = cv2.imread(os.path.join(settings.INPUT_FOLDER, img_name))
+    def get_predictions(self, img_name='', image=None, plot=False):
+        """
+        Returns tensor with bboxes in the format:
+           [x1, y1, x2, y2, score]
+        """
+        if img_name:
+            img = cv2.imread(os.path.join(settings.INPUT_FOLDER, img_name))
+        else:
+            img = image
+
         img_raw = img.copy()[:, :, ::-1].transpose((2, 0, 1))
         img, info_img = preprocess(img, self.imgsize, jitter=0)  # info = (h, w, nh, nw, dx, dy)
         img = np.transpose(img / 255., (2, 0, 1))
@@ -72,11 +73,9 @@ class MyModel:
             outputs = postprocess(
                 outputs, Dataset.NUM_CLASSES[Dataset.SIGNET_RING], self.confthre, self.nmsthre)
 
-        if not plot:
-            return outputs
-
         bboxes = list()
         colors = list()
+        bboxes_with_scores = list()
 
         if outputs[0] is not None:
             for x1, y1, x2, y2, conf, cls_conf, cls_pred in outputs[0]:
@@ -85,9 +84,14 @@ class MyModel:
                 box = yolobox2label([y1, x1, y2, x2], info_img)
                 bboxes.append(box)
                 colors.append(BOX_COLOR)
+                tmp = [box[1], box[0], box[3], box[2]]
+                tmp.append(conf * cls_conf)
+                bboxes_with_scores.append(tmp)
 
-        vis_bbox(
-            img_raw, bboxes, instance_colors=colors, linewidth=2)
-        plt.show()
+        if plot:
+            vis_bbox(
+                img_raw, bboxes, instance_colors=colors, linewidth=2)
+            plt.show()
 
-        return outputs
+        # return outputs
+        return torch.FloatTensor(bboxes_with_scores)
