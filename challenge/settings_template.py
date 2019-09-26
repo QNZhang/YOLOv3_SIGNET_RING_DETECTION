@@ -11,16 +11,8 @@ CONFIG_FILE = 'config/yolov3_eval_digestpath.cfg'
 
 USE_CUDA = True
 
-CUDA = torch.cuda.is_available() and USE_CUDA
-
 cut_size = 512
 
-overlap = 0.4 * cut_size
-
-# holdback = 0.7  # ?????
-
-# smalllim = 0.3  # ?????
+overlap = int(0.5 * cut_size)
 
 boardcache = 2
-
-# save_txt = OUTPUT_FOLDER

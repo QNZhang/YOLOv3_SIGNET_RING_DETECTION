@@ -13,6 +13,7 @@ def main():
         create_save_img_predictions=False,
         draw_annotations=False
     )
+
     # predictions = model.get_predictions(
     #     img_name='2018_64982_1-3_2019-02-25_21_57_36-lv0-33516-59515-2003-2010_0_0.jpeg', plot=True)
     # predictions = model.get_predictions(
