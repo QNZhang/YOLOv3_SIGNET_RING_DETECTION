@@ -20,7 +20,7 @@ ENV PYENV_ROOT /home/docker/.pyenv
 ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 RUN curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
 
-ENV PYTHON_VERSION 3.6.0
+ENV PYTHON_VERSION 3.6.8
 RUN pyenv install ${PYTHON_VERSION} && pyenv global ${PYTHON_VERSION}
 
 RUN pip install -U pip setuptools
@@ -29,6 +29,10 @@ RUN pip install Cython==0.29.1 numpy==1.15.4
 
 COPY requirements/requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
+
+COPY requirements.txt /tmp/requirements_2.txt
+RUN pip install -r /tmp/requirements_2.txt
+
 
 # mount YOLOv3-in-PyTorch to /work
 WORKDIR /work
