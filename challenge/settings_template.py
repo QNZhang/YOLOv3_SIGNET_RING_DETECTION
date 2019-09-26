@@ -11,8 +11,8 @@ CONFIG_FILE = 'config/yolov3_eval_digestpath.cfg'
 
 USE_CUDA = True
 
-cut_size = 512
+CUT_SIZE = 512
 
-overlap = int(0.5 * cut_size)
+OVERLAP = int(0.5 * CUT_SIZE)
 
-boardcache = 2
+BOARDCACHE = 2
