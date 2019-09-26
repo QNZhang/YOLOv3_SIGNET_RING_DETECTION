@@ -11,22 +11,25 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-from . import settings
-from .utils import use_cuda
 from constants import BOX_COLOR, Dataset
 from models.yolov3 import YOLOv3
 from utils.utils import preprocess, postprocess, yolobox2label
 from utils.vis_bbox import vis_bbox
+from .utils import use_cuda
+from . import settings
 
 
 class MyModel:
-    """  """
+    """ Model to easily load and manage the trained YOLOv3 """
 
     def __init__(self):
+        """ Initialized the model """
         self.load_model()
 
     def load_model(self):
-        """  """
+        """
+        Load the model using settings.CONFIG_FILE and settings.MODEL_CHECKPOINT
+        """
         with open(settings.CONFIG_FILE, 'r') as f:
             cfg = yaml.load(f)
 
@@ -50,8 +53,9 @@ class MyModel:
 
     def get_predictions(self, img_name='', image=None, plot=False):
         """
-        Returns tensor with bboxes in the format:
-           [x1, y1, x2, y2, score]
+        Gets the bounding box prediction for the image and returns them
+        in tensor of bboxes in the format:
+           [[x1, y1, x2, y2, score], ...]
         """
         if img_name:
             img = cv2.imread(os.path.join(settings.INPUT_FOLDER, img_name))
@@ -93,5 +97,4 @@ class MyModel:
                 img_raw, bboxes, instance_colors=colors, linewidth=2)
             plt.show()
 
-        # return outputs
         return torch.FloatTensor(bboxes_with_scores)

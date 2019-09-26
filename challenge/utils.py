@@ -11,8 +11,8 @@ import torch
 import xmltodict
 from PIL import Image, ImageDraw
 
-from . import settings
 from utils.utils import nms
+from . import settings
 
 
 def initial_validation_cleaning():
@@ -35,7 +35,7 @@ def use_cuda():
 
 def generate_save_xml(predictions, fileimg, img_width, img_height):
     """
-    Saves the predicitons into an xml file similar to training XML files annotations
+    Saves the predicitons into an xml file similar to Signet Ring training XML files annotations
     """
     def get_object_dict(xmin, ymin, xmax, ymax, confidence):
         """  """
@@ -86,30 +86,37 @@ def generate_save_xml(predictions, fileimg, img_width, img_height):
 
 
 def evaluation(x, y, cut_size, w, h, fimg, model):
-    """  """
+    """
+    Creates the mini-patch and gets its bounding boxes predictions, then transform them
+    into the right coordinates in the whole image and return them in a numpy array.
+
+    Returns:
+
+    [[x1, y1, x2, y2, score], ...]
+
+    """
     fimg = cv2.imread(fimg.filename)
     image = fimg[y:y+cut_size, x:x+cut_size]
     # cv2.imshow("cropped", image)
 
-    #######
     results = model.get_predictions(image=image, plot=False)
 
     if len(results) == 0:
         return None
 
     c = results.cpu().numpy()
-    #######
-    # c = coco_demo.select_top_predictions(c)
+
     if(x != 0 and y != 0 and x+cut_size != w and y+cut_size != h):
         i = 0
-        while(i < c.shape[0]):
-            if(c[i, 0] < settings.BOARDCACHE or c[i, 1] < settings.BOARDCACHE or c[i, 2] < settings.BOARDCACHE or c[i, 3] < settings.BOARDCACHE):
+        while i < c.shape[0]:
+            if(c[i, 0] < settings.BOARDCACHE or c[i, 1] < settings.BOARDCACHE or
+               c[i, 2] < settings.BOARDCACHE or c[i, 3] < settings.BOARDCACHE):
                 c = np.delete(c, i, axis=0)
                 i -= 1
             i += 1
     i = 0
 
-    while(i < c.shape[0]):
+    while i < c.shape[0]:
         c[i, 0] += x
         c[i, 1] += y
         c[i, 2] += x
@@ -120,7 +127,13 @@ def evaluation(x, y, cut_size, w, h, fimg, model):
 
 
 def process_input_files(model, create_save_img_predictions=False, draw_annotations=False):
-    """  """
+    """
+    * Iterates over the images in settings.INPUT_FOLDER
+    * Gets the bouding boxes predictions using the sliding window technique
+    * Applies non maximum suppression
+    * Saves the predictions on settings.OUTPUT_FOLDER and optionally images with
+      the predictions and ground truth bounding boxes
+    """
     for fileimg in tuple(filter(lambda x: x.endswith('.jpeg'), os.listdir(settings.INPUT_FOLDER))):
         print(fileimg)
         predictions = [[0, 0, 0, 0, 0]]
@@ -162,6 +175,7 @@ def process_input_files(model, create_save_img_predictions=False, draw_annotatio
 
         predictions = np.delete(predictions, 0, axis=0)
 
+        # applying non maximum suppression
         selected_ids = nms(predictions[:, :4], model.nmsthre, predictions[:, 4])
         predictions = predictions[selected_ids]
 
