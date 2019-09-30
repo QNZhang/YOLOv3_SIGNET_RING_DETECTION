@@ -15,7 +15,8 @@ def main():
     # os.system('python demo.py --cfg config/yolov3_default.cfg --image data/mountain.png --detect_thresh 0.5 --weights_path weights/yolov3.weights --dataset={}'.format(Dataset.COCO))
 
     # os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard True --checkpoint_interval=50 --eval_interval=50')
-    os.system('python train.py --tfboard True --checkpoint_interval=50 --eval_interval=50 --checkpoint "checkpoints/logs_test_size_0_2_512x512_pos_neg_sample/snapshot9350.ckpt"')
+    # os.system('python train.py --tfboard True --checkpoint_interval=50 --eval_interval=50 --checkpoint "checkpoints/logs_test_size_0_2_512x512_pos_neg_sample/snapshot9350.ckpt"')
+    os.system('python train.py --cfg config/yolov3_eval_digestpath.cfg --eval_interval 1 --checkpoint "checkpoints/logs_test_size_0_2_512x512_pos_neg_sample/snapshot9350.ckpt"')
 
     #os.system('python train.py --cfg config/yolov3_eval_digestpath.cfg --eval_interval 1 --checkpoint "checkpoints/xingru new anchors non-normalizesd IOU kmeans/snapshot750.ckpt"')
     # os.system('python train.py --cfg config/yolov3_eval_digestpath.cfg --eval_interval 1 --weights_path weights/yolov3.weights')
