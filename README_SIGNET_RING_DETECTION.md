@@ -1,3 +1,5 @@
+![Signet Ring Cell Detection](https://raw.githubusercontent.com/giussepi/PyTorch_YOLOv3/predicitions-per-whole-image/output_sample/2018_64982_1-3_2019-02-25%2021_57_36-lv0-34589-61706-2030-2044.jpeg)
+
 # Installation
 
 1. Follow the installation instructions from [README.md](README.md)
