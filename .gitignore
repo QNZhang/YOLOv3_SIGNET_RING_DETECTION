@@ -13,6 +13,7 @@ tensorboard_logs
 
 # model checkpoints
 checkpoints
+checkpoints_sample
 
 # shell logs
 shell_logs
