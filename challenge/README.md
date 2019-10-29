@@ -1,5 +1,7 @@
 # Signet Ring Cell Detection Challenge task 1
 
+![Signet Ring Detection](https://raw.githubusercontent.com/giussepi/PyTorch_YOLOv3/predicitions-per-whole-image/output_sample/2018_64982_1-3_2019-02-25%2021_57_36-lv0-36515-58465-2013-2071.jpeg)
+
 ## Installation
 The code to process WSI jpeg images is located at **challenge** folder. Thus,
 The procedure to analise WSI jpeg images is the following:
