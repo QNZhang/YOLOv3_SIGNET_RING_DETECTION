@@ -50,12 +50,16 @@
 # Evaluation
 
 Quick example using our provided checkpoint
+ 
+1. Get sample checkpoint. Download it at the same folder were input_sample is located.
 
-1. Rename `checkpoints_sample` folder.
+     `git clone git@github.com:giussepi/PyTorch_YOLOv3_sample_checkpoint.git`
 
-    `cp -r checkpoints_sample checkpoints` 
+2. Rename `PyTorch_YOLOv3_sample_checkpoint` folder.
+
+    `mv PyTorch_YOLOv3_sample_checkpoint checkpoints`
   
-2. Run the evaluation command.
+3. Run the evaluation command.
 
     `import os`
     
