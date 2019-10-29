@@ -34,12 +34,12 @@ Using provided checkpoint and sample images
 
      `git clone git@github.com:giussepi/PyTorch_YOLOv3_sample_checkpoint.git`
 
-2. Rename `PyTorch_YOLOv3_sample_checkpoint` folder (if not already done).
+3. Rename `PyTorch_YOLOv3_sample_checkpoint` folder (if not already done).
 
     `mv PyTorch_YOLOv3_sample_checkpoint checkpoints`
     
-3. Run the `Segmentation.py`.
+4. Run the `Segmentation.py`.
 
      `python Segmentation.py`
 
-4. Open and review the **output** folder
+5. Open and review the **output** folder
