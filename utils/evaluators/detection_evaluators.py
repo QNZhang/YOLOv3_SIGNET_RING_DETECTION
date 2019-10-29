@@ -131,6 +131,8 @@ class SignetRingEval:
         self.evalImgs = defaultdict(list)   # per-image per-category evaluation results
         self.eval = {}                  # accumulated evaluation results
 
+        print('{} images with detections, {} detections'.format(len(self._dts), len(dts)))
+
     def evaluate(self):
         '''
         Run per image evaluation on given images and store results (a list of dict) in self.evalImgs

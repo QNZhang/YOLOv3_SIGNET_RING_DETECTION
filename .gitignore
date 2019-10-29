@@ -13,6 +13,7 @@ tensorboard_logs
 
 # model checkpoints
 checkpoints
+checkpoints_sample
 
 # shell logs
 shell_logs
@@ -27,3 +28,7 @@ settings.py
 __pycache__/
 *.py[cod]
 *$py.class
+
+# input and output folders
+input
+output

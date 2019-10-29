@@ -52,7 +52,7 @@ class COCOAPIEvaluator():
         self.dataloader = torch.utils.data.DataLoader(
             self.dataset, batch_size=1, shuffle=False, num_workers=0)
         self.img_size = img_size
-        self.confthre = 0.005  # from darknet
+        self.confthre = confthre  # 0.005 # from darknet
         self.nmsthre = nmsthre  # 0.45 (darknet)
 
     def evaluate(self, model):
@@ -155,7 +155,7 @@ class SignetRingEvaluator:
         self.dataloader = torch.utils.data.DataLoader(
             self.dataset, batch_size=1, shuffle=False, num_workers=0)
         self.img_size = img_size
-        self.confthre = 0.005  # from darknet
+        self.confthre = confthre  # 0.005  # from darknet
         self.nmsthre = nmsthre  # 0.45 (darknet)
 
     def evaluate(self, model):

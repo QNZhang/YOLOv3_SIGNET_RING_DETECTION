@@ -9,7 +9,6 @@ from torch.autograd import Variable
 import matplotlib
 import matplotlib.pyplot as plt
 
-
 from constants import BOX_COLOR, Dataset
 from models.yolov3 import *
 from utils.utils import *
