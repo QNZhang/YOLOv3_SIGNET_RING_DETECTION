@@ -35,4 +35,6 @@ output
 
 # kfbreader compiled libraries
 libraries/kfbreader/libopencv_world.so.3.4.5
+# kfbreader symlinks
 libraries/kfbreader/libopencv_world.so.3.4
+libraries/kfbreader/libhzzt.so.1
