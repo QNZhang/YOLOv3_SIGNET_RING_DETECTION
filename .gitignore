@@ -32,3 +32,7 @@ __pycache__/
 # input and output folders
 input
 output
+
+# kfbreader compiled libraries
+libraries/kfbreader/libopencv_world.so.3.4.5
+libraries/kfbreader/libopencv_world.so.3.4
