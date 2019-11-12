@@ -3,14 +3,13 @@
 
 import os
 
-import cv2 as cv
-import kfbReader
-
+import settings
 from constants import Dataset
+from utils.files import generate_roi_and_bboxes_files
 from utils.utils import recalculate_anchor_boxes, recalculate_anchor_boxes_kmeans_iou
 from utils.data import get_or_create_bndbox_dict, get_or_create_train_test_files, \
     create_bndbox_file
-from utils.plot_tools import plot_img_plus_bounding_boxes
+from utils.plot_tools import plot_img_plus_bounding_boxes, plot_cervical_image_plus_bounding_boxes
 
 
 def main():
@@ -33,15 +32,15 @@ def main():
     # plot_img_plus_bounding_boxes('G1900703-2_2019-04-30 09_53_59-lv0-21164-5136-2060-2007.jpeg')
     ###############################################################################
 
-    # Testing kfbreader #######################################################
-    path = "/home/giussepi/Downloads/tianchi/neg_0/T2019_121.kfb"
-    scale = 20
+    # # Testing kfbreader #######################################################
+    # path = "/home/giussepi/Downloads/tianchi/neg_0/T2019_121.kfb"
+    # scale = 20
 
-    read = kfbReader.reader()
-    read.ReadInfo(path, scale, True)
-    roi = read.ReadRoi(10240, 10240, 512, 512, scale)
-    cv.imshow('roi', roi)
-    cv.waitKey(0)
+    # read = kfbReader.reader()
+    # read.ReadInfo(path, scale, True)
+    # roi = read.ReadRoi(10240, 10240, 512, 512, scale)
+    # cv.imshow('roi', roi)
+    # cv.waitKey(0)
 
     # height = read.getHeight()
     # width = read.getWidth()
@@ -71,3 +70,15 @@ if __name__ == '__main__':
     # bbox = test[list(test.keys())[0]][0]
     # print(bbox.area, bbox.id)
     ###############################################################################
+
+    json_files = [
+        '/home/giussepi/Downloads/tianchi/labels/T2019_10.json',
+        '/home/giussepi/Downloads/tianchi/labels/T2019_976.json',
+        '/home/giussepi/Downloads/tianchi/labels/T2019_53.json',
+    ]
+
+    img_list = ['/home/giussepi/Downloads/tianchi/pos_0/T2019_53.kfb']
+
+    # TODO: Finish this function after creating the mini patches
+    # plot_cervical_image_plus_bounding_boxes('T2019_53.kfb')
+    generate_roi_and_bboxes_files()

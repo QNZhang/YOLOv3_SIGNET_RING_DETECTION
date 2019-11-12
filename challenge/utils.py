@@ -33,7 +33,7 @@ def use_cuda():
     return torch.cuda.is_available() and settings.USE_CUDA
 
 
-def generate_save_xml(predictions, fileimg, img_width, img_height):
+def generate_save_xml(predictions, fileimg, img_width, img_height, roi_counter):
     """
     Saves the predicitons into an xml file similar to Signet Ring training XML files annotations
     """
@@ -41,7 +41,7 @@ def generate_save_xml(predictions, fileimg, img_width, img_height):
         """  """
         return {
             'object': {
-                'name': 'ring_cell_cancer',
+                'name': 'cervical_cancer',
                 'pose': 'Right',
                 'truncated': 1,
                 'occluded': 0,
@@ -57,16 +57,16 @@ def generate_save_xml(predictions, fileimg, img_width, img_height):
         }
 
     with open(
-            os.path.join(settings.OUTPUT_FOLDER, fileimg.replace(".jpeg", '.xml')),
+            os.path.join(settings.OUTPUT_FOLDER, "{}-roi{}.xml".format(fileimg, roi_counter)),
             'a'
     ) as file_:
         file_.write('<annotation>\n')
         file_.write(' <folder>annotations</folder>\n')
-        file_.write(' <filename>{}</filename>\n'.format(fileimg))
+        file_.write(' <filename>{}.kfb</filename>\n'.format(fileimg))
         file_.write(' <source>\n')
-        file_.write('  <database>The Ring Cell Database</database>\n')
-        file_.write('  <annotation>Ring Cell Dataset</annotation>\n')
-        file_.write('  <image>flickr</image>\n')
+        file_.write('  <database>Cervical Cancer Database</database>\n')
+        file_.write('  <annotation>Cancer Dataset</annotation>\n')
+        file_.write('  <image>tianchi</image>\n')
         file_.write(' </source>\n')
         file_.write(' <size>\n')
         file_.write('  <width>{}</width>\n'.format(img_width))
