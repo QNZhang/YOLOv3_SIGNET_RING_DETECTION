@@ -8,7 +8,8 @@ from collections import defaultdict
 
 import kfbReader
 
-from challenge.utils import generate_save_xml, settings as challenge_settings
+import settings
+from challenge.utils import generate_save_xml
 
 
 def get_name_and_extension(file_name):
@@ -27,9 +28,9 @@ def get_name_and_extension(file_name):
 
 def generate_roi_and_bboxes_files():
     """
-    * Reads the json and kfb files from challenge_settings.INPUT_FOLDER
+    * Reads the json and kfb files from settings.INPUT_FOLDER
     * Generates the img_roix json and img_roiX xml files and saves them in
-      challenge_settings.OUTPUT_FOLDER
+      settings.OUTPUT_FOLDER
       - Each img_roiX json file contains a roi + the image file source name
         {"source": "T2019_78.kfb", "roi": {"x": 22544, "y": 30002, "w": 3584, "h": 3158}}
       - Each img_roiX xml file contains the bboxes (xmin, ymin, xmax, ymax)
@@ -37,15 +38,15 @@ def generate_roi_and_bboxes_files():
 
     def initial_validation_cleaning():
         """ Verifies the input folder exists and cleans the output folder """
-        if not os.path.exists(challenge_settings.INPUT_FOLDER):
+        if not os.path.exists(settings.INPUT_FOLDER):
             raise FileNotFoundError(
                 "You must create a folder called {} and place the kfb and json files there."
-                .format(challenge_settings.INPUT_FOLDER))
+                .format(settings.INPUT_FOLDER))
 
         # Cleaning output folder
-        if os.path.exists(challenge_settings.OUTPUT_FOLDER):
-            shutil.rmtree(challenge_settings.OUTPUT_FOLDER)
-        os.makedirs(challenge_settings.OUTPUT_FOLDER)
+        if os.path.exists(settings.OUTPUT_FOLDER):
+            shutil.rmtree(settings.OUTPUT_FOLDER)
+        os.makedirs(settings.OUTPUT_FOLDER)
 
     def annotation_belongs_to_roi(annotation, roi):
         """
@@ -73,18 +74,18 @@ def generate_roi_and_bboxes_files():
     read.setReadScale(scale)
 
     for _file in list(filter(
-            lambda x: x.endswith('.json'), os.listdir(challenge_settings.INPUT_FOLDER))):
+            lambda x: x.endswith('.json'), os.listdir(settings.INPUT_FOLDER))):
         name, extension = get_name_and_extension(_file)
         kfb_filename = "{}.kfb".format(name)
         read.ReadInfo(
-            os.path.join(challenge_settings.INPUT_FOLDER, kfb_filename),
+            os.path.join(settings.INPUT_FOLDER, kfb_filename),
             scale,
             True
         )
         height = read.getHeight()
         width = read.getWidth()
 
-        with open(os.path.join(challenge_settings.INPUT_FOLDER, _file)) as _jfile:
+        with open(os.path.join(settings.INPUT_FOLDER, _file)) as _jfile:
             json_file = json.load(_jfile)
             rois = list(filter(lambda x: x['class'] == 'roi', json_file))
             rois_annotations = defaultdict(list)
@@ -111,7 +112,7 @@ def generate_roi_and_bboxes_files():
                     source=kfb_filename,
                     roi={'x': line['x'], 'y': line['y'], 'w': line['w'], 'h': line['h']}
                 )
-                with open(os.path.join(challenge_settings.OUTPUT_FOLDER, '{}-roi{}.json'.format(name, index+1)), 'w') as roi_json_file:
+                with open(os.path.join(settings.OUTPUT_FOLDER, '{}-roi{}.json'.format(name, index+1)), 'w') as roi_json_file:
                     json.dump(data, roi_json_file)
 
                 generate_save_xml(rois_annotations[index], name, width, height, index+1)

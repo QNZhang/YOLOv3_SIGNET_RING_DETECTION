@@ -9,7 +9,6 @@ import os
 
 COCO_PATH = 'COCO'
 
-
 DIGEST_PATH_2019_PATH = '/home/giussepi/Public/link/environments/challenges/digestpath_2019'
 SIGNET_TRAIN_NEG_IMG_PATH = os.path.join(
     DIGEST_PATH_2019_PATH, 'digestPath', 'Signet_ring_cell_dataset', 'sig-train-neg')
@@ -22,6 +21,14 @@ SIGNET_BOUNDING_BOXES_PATH = os.path.join(PICKLE_FILES_PATH, 'signet_bounding_bo
 SIGNET_TRAIN_PATH = os.path.join(PICKLE_FILES_PATH, 'train.pickle')
 # serialized list
 SIGNET_TEST_PATH = os.path.join(PICKLE_FILES_PATH, 'test.pickle')
+
+###############################################################################
+#                                   Processing folders
+###############################################################################
+
+INPUT_FOLDER = 'input'
+
+OUTPUT_FOLDER = 'output'
 
 ###############################################################################
 #                                   Evaluation
