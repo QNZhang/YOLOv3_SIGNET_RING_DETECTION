@@ -5,6 +5,7 @@ import os
 
 import settings
 from constants import Dataset
+from utils.classes.cutpatch import MiniPatch
 from utils.files import generate_roi_and_bboxes_files
 from utils.utils import recalculate_anchor_boxes, recalculate_anchor_boxes_kmeans_iou
 from utils.data import get_or_create_bndbox_dict, get_or_create_train_test_files, \
@@ -81,4 +82,5 @@ if __name__ == '__main__':
 
     # TODO: Finish this function after creating the mini patches
     # plot_cervical_image_plus_bounding_boxes('T2019_53.kfb')
-    generate_roi_and_bboxes_files()
+    # generate_roi_and_bboxes_files()
+    MiniPatch()()

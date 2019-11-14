@@ -31,6 +31,18 @@ INPUT_FOLDER = 'input'
 OUTPUT_FOLDER = 'output'
 
 ###############################################################################
+#                                 Minipatches                                  #
+###############################################################################
+
+HOLDBACK = 0.7
+SMALLLIM = 0.3
+CUT_SIZE = 512
+OVERLAP_COEFFICIENT = 0.5
+# overlap must be an integer to avoid errors with the sliding window algorithm
+OVERLAP = int(OVERLAP_COEFFICIENT * CUT_SIZE)
+KFBREADER_SCALE = 20
+
+###############################################################################
 #                                   Evaluation
 ###############################################################################
 

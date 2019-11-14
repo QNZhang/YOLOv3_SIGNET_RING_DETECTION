@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """ utils/files """
 
+from collections import defaultdict
 import json
 import os
 import shutil
-from collections import defaultdict
+
 
 import kfbReader
 
@@ -69,9 +70,8 @@ def generate_roi_and_bboxes_files():
 
     initial_validation_cleaning()
 
-    scale = 20
     read = kfbReader.reader()
-    read.setReadScale(scale)
+    read.setReadScale(settings.KFBREADER_SCALE)
 
     for _file in list(filter(
             lambda x: x.endswith('.json'), os.listdir(settings.INPUT_FOLDER))):
@@ -79,7 +79,7 @@ def generate_roi_and_bboxes_files():
         kfb_filename = "{}.kfb".format(name)
         read.ReadInfo(
             os.path.join(settings.INPUT_FOLDER, kfb_filename),
-            scale,
+            settings.KFBREADER_SCALE,
             True
         )
         height = read.getHeight()
