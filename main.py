@@ -83,4 +83,9 @@ if __name__ == '__main__':
     # TODO: Finish this function after creating the mini patches
     # plot_cervical_image_plus_bounding_boxes('T2019_53.kfb')
     # generate_roi_and_bboxes_files()
-    MiniPatch()()
+    # MiniPatch()()
+
+    # recalculate_anchor_boxes_kmeans_iou(Dataset.SIGNET_RING, print_results=True, num_centroids=9)
+
+    # os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard True --checkpoint_interval=50 --eval_interval=50')
+    os.system('python demo.py --image "/home/giussepi/Downloads/tianchi/positives/T2019_53-roi1_6620_22337.json" --detect_thresh 0.4 --weights weights/yolov3.weights')

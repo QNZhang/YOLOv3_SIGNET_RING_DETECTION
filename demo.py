@@ -3,16 +3,17 @@
 import argparse
 import yaml
 
-import cv2
 import torch
-from torch.autograd import Variable
+import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+from torch.autograd import Variable
 
 from constants import BOX_COLOR, Dataset
-from models.yolov3 import *
-from utils.utils import *
+from models.yolov3 import YOLOv3
+from utils.kfb import read_roi_json
 from utils.parse_yolo_weights import parse_yolo_weights
+from utils.utils import preprocess, yolobox2label, postprocess
 from utils.vis_bbox import vis_bbox
 
 
@@ -50,7 +51,7 @@ def main():
     if args.detect_thresh:
         confthre = args.detect_thresh
 
-    img = cv2.imread(args.image)
+    img = read_roi_json(args.image)
     img_raw = img.copy()[:, :, ::-1].transpose((2, 0, 1))
     img, info_img = preprocess(img, imgsize, jitter=0)  # info = (h, w, nh, nw, dx, dy)
     img = np.transpose(img / 255., (2, 0, 1))
