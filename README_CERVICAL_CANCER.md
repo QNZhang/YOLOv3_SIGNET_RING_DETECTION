@@ -25,7 +25,11 @@
 
    `cd input_a`
 
-   `rsync -zarv --include "*/" --include="*.kfb" --exclude="*" . ../ttt`
+   `rsync -zarv --include "*/" --include="*.kfb" --exclude="*" . ../input`
+
+   OR
+
+   `mv *.kfb ../input`
 
 4. Run the lines
 
