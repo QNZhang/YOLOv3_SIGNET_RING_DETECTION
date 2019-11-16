@@ -77,8 +77,12 @@ class MiniPatch:
             mm = 0
             genfilename = genfilename.replace(" ", "_")
 
-            if isinstance(documents['annotation']['object'], dict):
-                documents['annotation']['object'] = [documents['annotation']['object']]
+            # Not all the ROIs has bounding boxes #############################
+            try:
+                if isinstance(documents['annotation']['object'], dict):
+                    documents['annotation']['object'] = [documents['annotation']['object']]
+            except KeyError:
+                return False
 
             obj = len(documents['annotation']['object'])-1
             doc1 = deepcopy(documents)
@@ -95,15 +99,15 @@ class MiniPatch:
                 if(((x <= bx1 <= x2) or (x <= bx2 <= x2))
                    and ((y <= by1 <= y2) or (y <= by2 <= y2))
                    and ((min(x2, bx2) - max(x, bx1))*(min(y2, by2) - max(y, by1))) >= ((bx2 - bx1) * (by2 - by1) * self.smalllim)):
-                    # doc1['annotation']['object'][obj]['bndbox']['xmin'] = str(int(max(x, bx1)-x))
-                    # doc1['annotation']['object'][obj]['bndbox']['ymin'] = str(int(max(y, by1)-y))
-                    # doc1['annotation']['object'][obj]['bndbox']['xmax'] = str(int(min(x2, bx2)-x))
-                    # doc1['annotation']['object'][obj]['bndbox']['ymax'] = str(int(min(y2, by2)-y))
-                    # NOTE:  using real/original coordinates
-                    doc1['annotation']['object'][obj]['bndbox']['xmin'] = str(int(max(x, bx1)))
-                    doc1['annotation']['object'][obj]['bndbox']['ymin'] = str(int(max(y, by1)))
-                    doc1['annotation']['object'][obj]['bndbox']['xmax'] = str(int(min(x2, bx2)))
-                    doc1['annotation']['object'][obj]['bndbox']['ymax'] = str(int(min(y2, by2)))
+                    doc1['annotation']['object'][obj]['bndbox']['xmin'] = str(int(max(x, bx1)-x))
+                    doc1['annotation']['object'][obj]['bndbox']['ymin'] = str(int(max(y, by1)-y))
+                    doc1['annotation']['object'][obj]['bndbox']['xmax'] = str(int(min(x2, bx2)-x))
+                    doc1['annotation']['object'][obj]['bndbox']['ymax'] = str(int(min(y2, by2)-y))
+                    # # NOTE:  using real/original coordinates
+                    # doc1['annotation']['object'][obj]['bndbox']['xmin'] = str(int(max(x, bx1)))
+                    # doc1['annotation']['object'][obj]['bndbox']['ymin'] = str(int(max(y, by1)))
+                    # doc1['annotation']['object'][obj]['bndbox']['xmax'] = str(int(min(x2, bx2)))
+                    # doc1['annotation']['object'][obj]['bndbox']['ymax'] = str(int(min(y2, by2)))
 
                     mm += 1
                 else:
