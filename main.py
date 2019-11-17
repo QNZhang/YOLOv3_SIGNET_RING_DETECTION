@@ -10,7 +10,7 @@ from utils.files import generate_roi_and_bboxes_files
 from utils.utils import recalculate_anchor_boxes, recalculate_anchor_boxes_kmeans_iou
 from utils.data import get_or_create_bndbox_dict, get_or_create_train_test_files, \
     create_bndbox_file
-from utils.plot_tools import plot_img_plus_bounding_boxes, plot_cervical_image_plus_bounding_boxes
+from utils.plot_tools import plot_img_plus_bounding_boxes, create_X_cervical_images_plus_bounding_boxes
 
 
 def main():
@@ -67,7 +67,7 @@ def main():
 if __name__ == '__main__':
     main()
     ###############################################################################
-    # train, test = get_or_create_train_test_files(test_size=0.2, force_create=False)
+    # train, test = get_or_create_train_test_files(test_size=0.2, force_create=True)
     # bbox = test[list(test.keys())[0]][0]
     # print(bbox.area, bbox.id)
     ###############################################################################
@@ -80,12 +80,13 @@ if __name__ == '__main__':
 
     img_list = ['/home/giussepi/Downloads/tianchi/pos_0/T2019_53.kfb']
 
-    # TODO: Finish this function after creating the mini patches
-    # plot_cervical_image_plus_bounding_boxes('T2019_53.kfb')
+    create_X_cervical_images_plus_bounding_boxes((0, 100))
+
     # generate_roi_and_bboxes_files()
     # MiniPatch()()
 
     # recalculate_anchor_boxes_kmeans_iou(Dataset.SIGNET_RING, print_results=True, num_centroids=9)
 
     # os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard True --checkpoint_interval=50 --eval_interval=50')
-    os.system('python demo.py --image "/home/giussepi/Downloads/tianchi/positives/T2019_53-roi1_6620_22337.json" --detect_thresh 0.4 --weights weights/yolov3.weights')
+    # os.system('python train.py --tfboard True --checkpoint_interval=50 --eval_interval=50 --checkpoint "checkpoints/snapshot800.ckpt"')
+    # os.system('python demo.py --image "/home/giussepi/Downloads/tianchi/positives/T2019_53-roi1_6620_22337.json" --detect_thresh 0.4 --weights weights/yolov3.weights')

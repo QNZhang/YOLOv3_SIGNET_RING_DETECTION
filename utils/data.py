@@ -65,8 +65,7 @@ def create_bndbox_file():
     bndbox_dictionary = defaultdict(list)
     counter = 0
 
-    for xml_file in tuple(
-            filter(lambda x: x.endswith('.xml'), os.listdir(settings.SIGNET_TRAIN_POS_IMG_PATH))):
+    for xml_file in tuple(filter(lambda x: x.endswith('.xml'), os.listdir(settings.SIGNET_TRAIN_POS_IMG_PATH))):
         img_id, _ = get_name_and_extension(xml_file)
         try:
             root = ET.parse(os.path.join(settings.SIGNET_TRAIN_POS_IMG_PATH, xml_file)).getroot()

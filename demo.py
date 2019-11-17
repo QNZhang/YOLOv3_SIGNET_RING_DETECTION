@@ -51,7 +51,7 @@ def main():
     if args.detect_thresh:
         confthre = args.detect_thresh
 
-    img = read_roi_json(args.image)
+    img, _ = read_roi_json(args.image)
     img_raw = img.copy()[:, :, ::-1].transpose((2, 0, 1))
     img, info_img = preprocess(img, imgsize, jitter=0)  # info = (h, w, nh, nw, dx, dy)
     img = np.transpose(img / 255., (2, 0, 1))

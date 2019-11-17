@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """ utils/plot_tools """
 
-import json
 import os
+import time
+import xml.etree.ElementTree as ET
 
 import cv2 as cv
-import kfbReader
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 from matplotlib import patches
@@ -13,6 +13,7 @@ from matplotlib import patches
 import settings
 from .data import get_or_create_bndbox_dict
 from .files import get_name_and_extension
+from .kfb import read_roi_json
 
 
 def plot_img_plus_bounding_boxes(image_name, fig_width=15, fig_height=13):
@@ -43,54 +44,98 @@ def plot_img_plus_bounding_boxes(image_name, fig_width=15, fig_height=13):
     plt.show()
 
 
-def plot_cervical_image_plus_bounding_boxes(image_name, save_disk=False):
+def plot_cervical_image_plus_bounding_boxes(image_name, save_to_disk=False, saving_folder=''):
     """
-    Plots the KFB image and draws its bouding boxes.
+    Plots the KFB roi image (mini patch) along with its bounding boxes.
+    Args:
+        image_name: 'image-roiX.json'
+        save_to_disk: True or False
+        saving_folder: 'folder_name_to_save_roi.png'
+    Usage:
+        plot_cervical_image_plus_bounding_boxes(xmlfile, True, 'preview_rois')
     """
-    # TODO: Finish this after creating the mini patches????
+    assert isinstance(image_name, str) and image_name.endswith('.json')
+    assert isinstance(save_to_disk, bool)
+    assert isinstance(saving_folder, str)
+    print(image_name)
+
+    if saving_folder and not os.path.exists(saving_folder):
+        os.mkdir(saving_folder)
+
     name, _ = get_name_and_extension(image_name)
 
-    with open(os.path.join(settings.SIGNET_TRAIN_POS_IMG_PATH, name + ".json")) as jfile:
-        ann = json.load(jfile)
-        scale = 20
-        read = kfbReader.reader()
-        read.setReadScale(scale)
-        read.ReadInfo(
-            os.path.join(settings.SIGNET_TRAIN_POS_IMG_PATH, image_name),
-            scale,
-            True
-        )
-        print(scale)
-        height = read.getHeight()
-        width = read.getWidth()
-        scale = read.getReadScale()
-        print('height: ', height)
-        print('width: ', width)
-        print('scale: ', scale)
+    roi, roi_anns = read_roi_json(os.path.join(settings.SIGNET_TRAIN_POS_IMG_PATH, image_name))
 
-        roi_ann = ann[0]
-        pos_anns = ann[1:]
+    root = ET.parse(os.path.join(settings.SIGNET_TRAIN_POS_IMG_PATH, name + ".xml")).getroot()
+    for _object in root.findall('./object'):
+        bndbox = {elem.tag: int(elem.text) for elem in _object.find('bndbox').getchildren()}
 
-        roi = read.ReadRoi(roi_ann['x'], roi_ann['y'], roi_ann['w'], roi_ann['h'], scale=20)
-
-        for pos_ann in pos_anns:
+        if bndbox:
             cv.rectangle(
                 roi,
-                (pos_ann['x']-roi_ann['x'], pos_ann['y']-roi_ann['y']),
-                (pos_ann['x']-roi_ann['x']+pos_ann['w'], pos_ann['y']-roi_ann['y']+pos_ann['h']),
+                (bndbox['xmin'], bndbox['ymin']),
+                (bndbox['xmax'], bndbox['ymax']),
                 (0, 0, 255),
                 8
             )
 
-        # cv.imshow('roi', roi)
-        # cv.waitKey(1000)
-        # cv.imwrite("ttt2.png", roi)
+    # cv.imshow('roi', roi)
+    # cv.waitKey(1000)
 
-        cv.imwrite('ttt4.png', roi[
-            pos_anns[0]['y']-roi_ann['y']:pos_anns[0]['y']-roi_ann['y']+pos_anns[0]['h'],
-            pos_anns[0]['x']-roi_ann['x']:pos_anns[0]['x']-roi_ann['x']+pos_anns[0]['w']
-        ])
+    if save_to_disk:
 
-        cv.imwrite('ttt3.png', read.ReadRoi(
-            pos_anns[0]['x'], pos_anns[0]['y'],
-            pos_anns[0]['w'], pos_anns[0]['h'], scale=20))
+        if saving_folder:
+            filepath = os.path.join(saving_folder, name + ".jpeg")
+        else:
+            filepath = name + ".jpeg"
+
+        cv.imwrite(filepath, roi)
+        # cv.imwrite('ttt4.png', roi[
+        #     pos_anns[0]['y']-roi_ann['y']:pos_anns[0]['y']-roi_ann['y']+pos_anns[0]['h'],
+        #     pos_anns[0]['x']-roi_ann['x']:pos_anns[0]['x']-roi_ann['x']+pos_anns[0]['w']
+        # ])
+
+
+def create_X_cervical_images_plus_bounding_boxes(
+        img_range=None, reading_folder=settings.SIGNET_TRAIN_POS_IMG_PATH,
+        saving_folder='preview_rois', sleep_time=5):
+    """
+    Creates and saves JPEG images of the first 'img_number' KFB roi image (mini patch)
+    along with their bounding boxes.
+
+    Notes:
+    * If img_name is None, images from all minipatches in the reading directory will
+      be created.
+    * If there are errors when running this function, try increasing the sleep_time
+    Args:
+        img_range: tuple containing lower and upper bounds for the images to be created
+        reading_folder: path to folder containing the minipatches
+        saving_folder: folder name to save the images (str)
+        sleep_time: delay after saving 5 images (to avoid error for saving too much folders
+                    at the same time)
+    Usage:
+        # first 10 minipatches
+        create_X_cervical_images_plus_bounding_boxes((0, 10))
+        # all minipatches
+        create_X_cervical_images_plus_bounding_boxes()
+    """
+    assert isinstance(img_range, tuple) or img_range is None
+    assert os.path.exists(reading_folder)
+
+    minipatches_list = tuple(filter(lambda x: x.endswith('.json'), os.listdir(reading_folder)))
+    total_minipatches = len(minipatches_list)
+    lower = upper = None
+
+    if img_range is None:
+        lower, upper = 0, total_minipatches
+    else:
+        assert isinstance(img_range[0], int) and isinstance(img_range[1], int)
+        assert img_range[0] < img_range[1]
+        assert 0 <= img_range[0] < total_minipatches
+        assert img_range[1] <= total_minipatches
+        lower, upper = img_range[0], img_range[1]
+
+    for index, xmlfile in enumerate(minipatches_list[lower:upper]):
+        plot_cervical_image_plus_bounding_boxes(xmlfile, True, saving_folder)
+        if index % 5 == 0:
+            time.sleep(sleep_time)
