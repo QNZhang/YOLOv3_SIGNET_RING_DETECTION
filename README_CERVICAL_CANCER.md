@@ -36,3 +36,12 @@
    `from utils.classes.cutpatch import MiniPatch`
 
    `MiniPatch()()`
+
+### Create JPEG of minipatches along with their bounding boxes
+1. Review the function definition of `utils.plot_tools.create_X_cervical_images_plus_bounding_boxes`
+
+2. Then run the lines (modify them as necessary)
+
+   `from utils.plot_tools import create_X_cervical_images_plus_bounding_boxes`
+
+   `create_X_cervical_images_plus_bounding_boxes((0, 100))`
