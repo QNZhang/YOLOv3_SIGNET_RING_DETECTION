@@ -8,6 +8,7 @@ class YOLOLayer(nn.Module):
     """
     detection layer corresponding to yolo_layer.c of darknet
     """
+
     def __init__(self, config_model, layer_no, in_ch, ignore_thre=0.7):
         """
         Args:
@@ -22,7 +23,7 @@ class YOLOLayer(nn.Module):
         """
 
         super(YOLOLayer, self).__init__()
-        strides = [32, 16, 8] # fixed
+        strides = [32, 16, 8]  # fixed
         self.anchors = config_model['ANCHORS']
         self.anch_mask = config_model['ANCH_MASK'][layer_no]
         self.n_anchors = len(self.anch_mask)
@@ -152,7 +153,9 @@ class YOLOLayer(nn.Module):
             pred_best_iou = (pred_best_iou > self.ignore_thre)
             pred_best_iou = pred_best_iou.view(pred[b].shape[:3])
             # set mask to zero (ignore) if pred matches truth
-            obj_mask[b] = 1 - pred_best_iou
+            # obj_mask[b] = 1 - pred_best_iou
+            # NOTE: update to make it work with pytorch 1.3
+            obj_mask[b] = ~pred_best_iou
 
             if sum(best_n_mask) == 0:
                 continue

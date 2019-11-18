@@ -11,6 +11,7 @@ from torch.utils.data import Dataset
 
 import constants
 import settings
+from utils.kfb import read_roi_json
 from utils.managers.signet_ring_cell_dataset import SignetRingMGR
 from utils.utils import label2yolobox, preprocess, random_distort
 
@@ -207,8 +208,8 @@ class SignetRing(Dataset):
         if np.random.rand() > 0.5 and self.lrflip is True:
             lrflip = True
 
-        img_file = os.path.join(self.img_train_dir, '{}.jpeg'.format(id_))
-        img = cv2.imread(img_file)
+        img_file = os.path.join(self.img_train_dir, '{}.json'.format(id_))
+        img, _ = read_roi_json(img_file)
 
         assert img is not None
 

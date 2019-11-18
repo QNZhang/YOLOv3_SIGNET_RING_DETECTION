@@ -6,11 +6,12 @@ import os
 import settings
 from constants import Dataset
 from utils.classes.cutpatch import MiniPatch
-from utils.files import generate_roi_and_bboxes_files
-from utils.utils import recalculate_anchor_boxes, recalculate_anchor_boxes_kmeans_iou
 from utils.data import get_or_create_bndbox_dict, get_or_create_train_test_files, \
     create_bndbox_file
-from utils.plot_tools import plot_img_plus_bounding_boxes, create_X_cervical_images_plus_bounding_boxes
+from utils.files import generate_roi_and_bboxes_files
+from utils.kfb import read_roi_json
+from utils.plot_tools import plot_img_plus_bounding_boxes
+from utils.utils import recalculate_anchor_boxes, recalculate_anchor_boxes_kmeans_iou
 
 
 def main():
@@ -79,8 +80,6 @@ if __name__ == '__main__':
     ]
 
     img_list = ['/home/giussepi/Downloads/tianchi/pos_0/T2019_53.kfb']
-
-    create_X_cervical_images_plus_bounding_boxes((0, 100))
 
     # generate_roi_and_bboxes_files()
     # MiniPatch()()
