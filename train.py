@@ -189,8 +189,6 @@ def main():
             except StopIteration:
                 dataiterator = iter(dataloader)
                 imgs, targets, _, _ = next(dataiterator)  # load a batch
-            # __import__("pdb").set_trace()
-            # IndexError: index 220 is out of bounds for dimension 2 with size 16
 
             imgs = Variable(imgs.type(dtype))
             targets = Variable(targets.type(dtype), requires_grad=False)
