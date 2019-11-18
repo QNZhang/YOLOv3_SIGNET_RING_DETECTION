@@ -2,7 +2,6 @@
 """ utils/plot_tools """
 
 import os
-import time
 import xml.etree.ElementTree as ET
 
 import cv2 as cv
@@ -98,7 +97,7 @@ def plot_cervical_image_plus_bounding_boxes(image_name, save_to_disk=False, savi
 
 def create_X_cervical_images_plus_bounding_boxes(
         img_range=None, reading_folder=settings.SIGNET_TRAIN_POS_IMG_PATH,
-        saving_folder='preview_rois', sleep_time=5):
+        saving_folder='preview_rois'):
     """
     Creates and saves JPEG images of the first 'img_number' KFB roi image (mini patch)
     along with their bounding boxes.
@@ -106,13 +105,18 @@ def create_X_cervical_images_plus_bounding_boxes(
     Notes:
     * If img_name is None, images from all minipatches in the reading directory will
       be created.
-    * If there are errors when running this function, try increasing the sleep_time
+    * If there are errors when running this function, re-run it starting on the last
+      image processed (review number of images in saving_folder)
+      Some common errors could be:
+      - Process Python bus error (core dumped)
+      - corrupted double-linked list
+      - corrupted double-linked list (not small)
+      - Process Python aborted (core dumped)
+      - Process Python segmentation fault (core dumped)
     Args:
         img_range: tuple containing lower and upper bounds for the images to be created
         reading_folder: path to folder containing the minipatches
         saving_folder: folder name to save the images (str)
-        sleep_time: delay after saving 5 images (to avoid error for saving too much folders
-                    at the same time)
     Usage:
         # first 10 minipatches
         create_X_cervical_images_plus_bounding_boxes((0, 10))
@@ -124,6 +128,7 @@ def create_X_cervical_images_plus_bounding_boxes(
 
     minipatches_list = tuple(filter(lambda x: x.endswith('.json'), os.listdir(reading_folder)))
     total_minipatches = len(minipatches_list)
+    print(total_minipatches)
     lower = upper = None
 
     if img_range is None:
@@ -137,5 +142,3 @@ def create_X_cervical_images_plus_bounding_boxes(
 
     for index, xmlfile in enumerate(minipatches_list[lower:upper]):
         plot_cervical_image_plus_bounding_boxes(xmlfile, True, saving_folder)
-        if index % 5 == 0:
-            time.sleep(sleep_time)
