@@ -155,6 +155,7 @@ class YOLOLayer(nn.Module):
             # set mask to zero (ignore) if pred matches truth
             # obj_mask[b] = 1 - pred_best_iou
             # NOTE: update to make it work with pytorch 1.3
+            # https://github.com/OpenNMT/OpenNMT-py/issues/1524#issuecomment-522958964
             obj_mask[b] = ~pred_best_iou
 
             if sum(best_n_mask) == 0:
