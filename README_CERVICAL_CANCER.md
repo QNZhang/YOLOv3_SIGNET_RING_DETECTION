@@ -45,3 +45,12 @@
    `from utils.plot_tools import create_X_cervical_images_plus_bounding_boxes`
 
    `create_X_cervical_images_plus_bounding_boxes((0, 100))`
+
+### Plot image along with its bouding boxes
+1. Review `utils.plot_tools.plot_img_plus_bounding_boxes`
+
+2. Run the following lines (modify them as necessary)
+
+   `from utils.plot_tools import plot_img_plus_bounding_boxes`
+
+	`plot_img_plus_bounding_boxes('T2019_999-roi2_33232_15350.jpeg', save_to_disk=True)`
