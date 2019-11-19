@@ -15,10 +15,17 @@ from .files import get_name_and_extension
 from .kfb import read_roi_json
 
 
-def plot_img_plus_bounding_boxes(image_name, fig_width=15, fig_height=13):
+def plot_img_plus_bounding_boxes(image_name, fig_width=15, fig_height=13, save_to_disk=False):
     """
     img_name: <name>.<extension>
     Plots the image along with its bounding boxes
+    Args:
+        image_name: 'image.jpeg'
+        fig_width: width for pytplot figsize configuration
+        fig_height: height for pyplot figsize configuration
+        save_to_disk: True or False
+    Usage:
+        plot_img_plus_bounding_boxes('T2019_999-roi2_33232_15350.jpeg')
     """
     assert isinstance(image_name, str) and isinstance(fig_width, int) and \
         isinstance(fig_height, int)
@@ -41,7 +48,8 @@ def plot_img_plus_bounding_boxes(image_name, fig_width=15, fig_height=13):
 
     ax.imshow(img)
     plt.show()
-    # fig.savefig('example.png')
+    if save_to_disk:
+        fig.savefig('{}.png'.format(name))
 
 
 def plot_cervical_image_plus_bounding_boxes(image_name, save_to_disk=False, saving_folder='', draw_bbox=True):
