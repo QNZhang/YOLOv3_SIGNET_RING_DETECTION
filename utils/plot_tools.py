@@ -41,21 +41,24 @@ def plot_img_plus_bounding_boxes(image_name, fig_width=15, fig_height=13):
 
     ax.imshow(img)
     plt.show()
+    # fig.savefig('example.png')
 
 
-def plot_cervical_image_plus_bounding_boxes(image_name, save_to_disk=False, saving_folder=''):
+def plot_cervical_image_plus_bounding_boxes(image_name, save_to_disk=False, saving_folder='', draw_bbox=True):
     """
     Plots the KFB roi image (mini patch) along with its bounding boxes.
     Args:
         image_name: 'image-roiX.json'
         save_to_disk: True or False
         saving_folder: 'folder_name_to_save_roi.png'
+        draw_bbox: True or False
     Usage:
         plot_cervical_image_plus_bounding_boxes(xmlfile, True, 'preview_rois')
     """
     assert isinstance(image_name, str) and image_name.endswith('.json')
     assert isinstance(save_to_disk, bool)
     assert isinstance(saving_folder, str)
+    assert isinstance(draw_bbox, bool)
     print(image_name)
 
     if saving_folder and not os.path.exists(saving_folder):
@@ -66,17 +69,18 @@ def plot_cervical_image_plus_bounding_boxes(image_name, save_to_disk=False, savi
     roi, roi_anns = read_roi_json(os.path.join(settings.SIGNET_TRAIN_POS_IMG_PATH, image_name))
 
     root = ET.parse(os.path.join(settings.SIGNET_TRAIN_POS_IMG_PATH, name + ".xml")).getroot()
-    for _object in root.findall('./object'):
-        bndbox = {elem.tag: int(elem.text) for elem in _object.find('bndbox').getchildren()}
+    if draw_bbox:
+        for _object in root.findall('./object'):
+            bndbox = {elem.tag: int(elem.text) for elem in _object.find('bndbox').getchildren()}
 
-        if bndbox:
-            cv.rectangle(
-                roi,
-                (bndbox['xmin'], bndbox['ymin']),
-                (bndbox['xmax'], bndbox['ymax']),
-                (0, 0, 255),
-                8
-            )
+            if bndbox:
+                cv.rectangle(
+                    roi,
+                    (bndbox['xmin'], bndbox['ymin']),
+                    (bndbox['xmax'], bndbox['ymax']),
+                    (0, 0, 255),
+                    8
+                )
 
     # cv.imshow('roi', roi)
     # cv.waitKey(1000)
@@ -97,7 +101,7 @@ def plot_cervical_image_plus_bounding_boxes(image_name, save_to_disk=False, savi
 
 def create_X_cervical_images_plus_bounding_boxes(
         img_range=None, reading_folder=settings.SIGNET_TRAIN_POS_IMG_PATH,
-        saving_folder='preview_rois'):
+        saving_folder='preview_rois', draw_bbox=True):
     """
     Creates and saves JPEG images of the first 'img_number' KFB roi image (mini patch)
     along with their bounding boxes.
@@ -117,6 +121,7 @@ def create_X_cervical_images_plus_bounding_boxes(
         img_range: tuple containing lower and upper bounds for the images to be created
         reading_folder: path to folder containing the minipatches
         saving_folder: folder name to save the images (str)
+        draw_bbox: boolean indicanting to draw or not the bounding box
     Usage:
         # first 10 minipatches
         create_X_cervical_images_plus_bounding_boxes((0, 10))
@@ -141,4 +146,4 @@ def create_X_cervical_images_plus_bounding_boxes(
         lower, upper = img_range[0], img_range[1]
 
     for index, xmlfile in enumerate(minipatches_list[lower:upper]):
-        plot_cervical_image_plus_bounding_boxes(xmlfile, True, saving_folder)
+        plot_cervical_image_plus_bounding_boxes(xmlfile, True, saving_folder, draw_bbox)

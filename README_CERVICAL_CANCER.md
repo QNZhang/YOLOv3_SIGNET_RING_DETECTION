@@ -37,7 +37,7 @@
 
    `MiniPatch()()`
 
-### Create JPEG of minipatches along with their bounding boxes
+### Create JPEG of minipatches along with their bounding boxes (optional)
 1. Review the function definition of `utils.plot_tools.create_X_cervical_images_plus_bounding_boxes`
 
 2. Then run the lines (modify them as necessary)
