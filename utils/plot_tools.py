@@ -110,7 +110,8 @@ def create_X_cervical_images_plus_bounding_boxes(
     * If img_name is None, images from all minipatches in the reading directory will
       be created.
     * If there are errors when running this function, re-run it starting on the last
-      image processed (review number of images in saving_folder)
+      image processed (review number of images in saving_folder). This error happens when
+      draw_bbox = True, seems that it's and issue with CV2.
       Some common errors could be:
       - Process Python bus error (core dumped)
       - corrupted double-linked list
