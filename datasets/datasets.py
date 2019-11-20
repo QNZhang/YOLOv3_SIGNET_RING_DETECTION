@@ -208,8 +208,9 @@ class SignetRing(Dataset):
         if np.random.rand() > 0.5 and self.lrflip is True:
             lrflip = True
 
-        img_file = os.path.join(self.img_train_dir, '{}.json'.format(id_))
-        img, _ = read_roi_json(img_file)
+        img_file = os.path.join(self.img_train_dir, '{}.jpeg'.format(id_))
+        img = cv2.imread(img_file)
+        # img, _ = read_roi_json(img_file)
 
         assert img is not None
 
