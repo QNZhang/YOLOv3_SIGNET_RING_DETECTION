@@ -5,13 +5,12 @@ import os
 
 import settings
 from constants import Dataset
-from utils.classes.cutpatch import MiniPatch
+from utils.classes.cutpatch import MiniPatch, TestMiniPatch
 from utils.data import get_or_create_bndbox_dict, get_or_create_train_test_files, \
     create_bndbox_file
 from utils.files import generate_roi_and_bboxes_files
-from utils.kfb import read_roi_json
 from utils.plot_tools import plot_img_plus_bounding_boxes
-from utils.utils import recalculate_anchor_boxes, recalculate_anchor_boxes_kmeans_iou
+from utils.utils import recalculate_anchor_boxes, recalculate_anchor_boxes_kmeans_iou, dhash, hamming
 
 
 def main():
@@ -73,19 +72,43 @@ if __name__ == '__main__':
     # print(bbox.area, bbox.id)
     ###############################################################################
 
-    json_files = [
-        '/home/giussepi/Downloads/tianchi/labels/T2019_10.json',
-        '/home/giussepi/Downloads/tianchi/labels/T2019_976.json',
-        '/home/giussepi/Downloads/tianchi/labels/T2019_53.json',
-    ]
-
-    img_list = ['/home/giussepi/Downloads/tianchi/pos_0/T2019_53.kfb']
-
     # generate_roi_and_bboxes_files()
     # MiniPatch()()
 
     # recalculate_anchor_boxes_kmeans_iou(Dataset.SIGNET_RING, print_results=True, num_centroids=9)
-
+    # hereee
     # os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard True --checkpoint_interval=50 --eval_interval=50')
-    # os.system('python train.py --tfboard True --checkpoint_interval=50 --eval_interval=50 --checkpoint "checkpoints/snapshot800.ckpt"')
+    # os.system('python train.py --tfboard True --checkpoint_interval=50 --eval_interval=50 --checkpoint "checkpoints/snapshot1500.ckpt"')
+
     # os.system('python demo.py --image "/home/giussepi/Downloads/tianchi/positives/T2019_53-roi1_6620_22337.json" --detect_thresh 0.4 --weights weights/yolov3.weights')
+    # os.system(
+    #     'python demo.py --image "{}" --detect_thresh 0.4 --weights weights/yolov3.weights'
+    #     .format(os.path.join(settings.SIGNET_TRAIN_POS_IMG_PATH, 'T2019_4-roi2_16240_25404.jpeg'))
+    # )
+
+    ###########################################################################
+    #          Creating jpeg of minipatches for training and testing          #
+    ###########################################################################
+    # from utils.plot_tools import create_X_cervical_images_plus_bounding_boxes
+    # create_X_cervical_images_plus_bounding_boxes((22187, 22188), draw_bbox=False)
+
+    ###########################################################################
+    #                              traing kkmeans                          #
+    ###########################################################################
+    # a = dhash(os.path.join(settings.SIGNET_TRAIN_POS_IMG_PATH, 'T2019_999-roi2_33232_15350.jpeg'))
+    # b = dhash(os.path.join(settings.SIGNET_TRAIN_POS_IMG_PATH, 'T2019_10-roi1_10994_4665.jpeg'))
+    # hamming(a, b)
+
+    # from scipy.spatial.distance import cdist
+    # # from utils.kmeans import kmeans_hamming
+    # import random
+
+    # points2 = [[random.randint(1, 100000)] for _ in range(10)]
+    # # points2.extend([random.randint(1, 100000)*10+10 for _ in range(10)])
+    # # print(kmeans_hamming(points2, points2[:2], 100))
+
+    # from sklearn.cluster import KMeans
+    # import numpy as np
+
+    # kmeans = KMeans(n_clusters=2, random_state=42).fit(points2)
+    TestMiniPatch()()

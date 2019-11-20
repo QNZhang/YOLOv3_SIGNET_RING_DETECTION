@@ -11,7 +11,6 @@
 
    `generate_roi_and_bboxes_files()`
 
-
 ## Generate minipatches
 1. Rename `input` and `output` folder from previous step
 
@@ -54,3 +53,14 @@
    `from utils.plot_tools import plot_img_plus_bounding_boxes`
 
 	`plot_img_plus_bounding_boxes('T2019_999-roi2_33232_15350.jpeg', save_to_disk=True)`
+
+
+### Testing
+
+1. Create test jpeg minipatches
+
+	`from utils.classes.cutpatch import TestMiniPatch`
+
+   `TestMiniPatch()()`
+
+2.

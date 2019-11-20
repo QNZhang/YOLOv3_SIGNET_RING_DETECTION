@@ -541,3 +541,33 @@ def recalculate_anchor_boxes_kmeans_iou(option, print_results=False, num_centroi
         return new_anchors
 
     raise NotImplementedError
+
+
+def dhash(image_path, hashSize=8):
+    """
+    source: https://www.pyimagesearch.com/2019/08/26/building-an-image-hashing-search-engine-with-vp-trees-and-opencv/
+    """
+    assert os.path.isfile(image_path)
+
+    image = cv2.imread(image_path)
+    # convert the image to grayscale
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    # resize the grayscale image, adding a single column (width) so we
+    # can compute the horizontal gradient
+    resized = cv2.resize(gray, (hashSize + 1, hashSize))
+
+    # compute the (relative) horizontal gradient between adjacent
+    # column pixels
+    diff = resized[:, 1:] > resized[:, :-1]
+
+    # convert the difference image to a hash
+    return sum([2 ** i for (i, v) in enumerate(diff.flatten()) if v])
+
+
+def hamming(a, b):
+    """
+    Compute and return the Hamming distance between the integers
+    https://www.pyimagesearch.com/2019/08/26/building-an-image-hashing-search-engine-with-vp-trees-and-opencv/
+    """
+    return bin(int(a) ^ int(b)).count("1")
