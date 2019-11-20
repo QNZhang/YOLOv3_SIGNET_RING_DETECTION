@@ -30,6 +30,13 @@ INPUT_FOLDER = 'input'
 
 OUTPUT_FOLDER = 'output'
 
+TEST_INPUT_FOLDER = 'testing'
+
+TEST_OUPUT_FOLDER = 'prediction_result/'
+
+# files generated during Tianchi Testing
+TEST_TMP_DATA = 'user_data/jpeg_minipatches/'
+
 ###############################################################################
 #                                 Minipatches                                  #
 ###############################################################################
