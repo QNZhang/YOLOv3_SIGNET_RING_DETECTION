@@ -6,6 +6,7 @@ import json
 import os
 import shutil
 
+import cv2 as cv
 import kfbReader
 import xmltodict
 
@@ -281,3 +282,97 @@ class MiniPatch:
                     )
                 else:
                     print("none4!")
+
+
+class TestMiniPatch:
+    """ Reads testing kfb files and create their jpeg minipatches """
+
+    def __init__(self, *args, **kwargs):
+        """
+        * Initializes the object
+        """
+        self.path_images = kwargs.get('path_images', settings.TEST_INPUT_FOLDER)
+        self.kfb_list = os.listdir(self.path_images)
+        self.holdback = kwargs.get('holdback', settings.HOLDBACK)
+        self.smalllim = kwargs.get('smallim', settings.SMALLLIM)
+        self.cut_size = kwargs.get('cut_size', settings.CUT_SIZE)
+        self.overlap_coefficient = kwargs.get('overlap_coefficient', settings.OVERLAP_COEFFICIENT)
+        self.overlap = int(self.overlap_coefficient * self.cut_size)
+
+        self.__clean_create_folders()
+
+    def __call__(self):
+        """ Functor call """
+        return self.__process_files()
+
+    def __clean_create_folders(self):
+        """ Removes the output and tmp folders and recreate them for the new outputs """
+        assert os.path.isdir(self.path_images)
+
+        if os.path.isdir(settings.TEST_OUPUT_FOLDER):
+            shutil.rmtree(settings.TEST_OUPUT_FOLDER)
+        os.makedirs(settings.TEST_OUPUT_FOLDER)
+
+        if os.path.isdir(settings.TEST_TMP_DATA):
+            shutil.rmtree(settings.TEST_TMP_DATA)
+        os.makedirs(settings.TEST_TMP_DATA)
+
+    def __create_jpeg_image(self, filename, xmin, ymin, xmax, ymax):
+        """
+        Creates a jpeg from the roi specified by the arguments and saves it at
+        settings.TEST_TMP_DATA
+        """
+        roi = self.read.ReadRoi(xmin, ymin, xmax-xmin, ymax-ymin, scale=settings.KFBREADER_SCALE)
+        cv.imwrite(
+            os.path.join(settings.TEST_TMP_DATA, filename),
+            roi
+        )
+
+    def __process_files(self):
+        """
+        Reads the kfb files from self.kfb_list and creates the
+        jpeg minipatches
+        """
+        self.read = kfbReader.reader()
+        self.read.setReadScale(settings.KFBREADER_SCALE)
+
+        for kfbfile in self.kfb_list:
+            print(kfbfile)
+            self.read.ReadInfo(
+                os.path.join(self.path_images, kfbfile),
+                settings.KFBREADER_SCALE,
+                True
+            )
+
+            h, w = self.read.getHeight(), self.read.getWidth()
+            y = 0
+
+            while(y <= (h-self.cut_size)):
+                x = 0
+                while(x <= (w-self.cut_size)):
+                    genfilename = kfbfile.replace(".kfb", "_{}_{}.jpeg".format(x, y))
+                    genfilename = genfilename.replace(" ", "_")
+                    self.__create_jpeg_image(genfilename, x, y, x+self.cut_size, y+self.cut_size)
+                    x = x + self.overlap
+
+                if ((x-self.cut_size) <= (self.holdback*self.cut_size)):
+                    x = w - self.cut_size
+                    genfilename = kfbfile.replace(".kfb", "_{}_{}.jpeg".format(x, y))
+                    genfilename = genfilename.replace(" ", "_")
+                    self.__create_jpeg_image(genfilename, x, y, w, y+self.cut_size)
+
+                y = y + self.overlap
+
+            if(((h/self.cut_size) - (h//self.cut_size)) >= self.holdback):
+                x = 0
+                y = h - self.cut_size
+                while(x <= (w-self.cut_size)):
+                    genfilename = kfbfile.replace(".kfb", "_{}_{}.jpeg".format(x, y))
+                    genfilename = genfilename.replace(" ", "_")
+                    self.__create_jpeg_image(genfilename, x, y, x+self.cut_size, y+self.cut_size)
+                    x = x + self.overlap
+
+                genfilename = kfbfile.replace(".kfb", "_{}_{}.jpeg".format(
+                    w-self.cut_size, h-self.cut_size))
+                genfilename = genfilename.replace(" ", "_")
+                self.__create_jpeg_image(genfilename, w-self.cut_size, h-self.cut_size, w, h)
