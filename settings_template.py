@@ -30,12 +30,24 @@ INPUT_FOLDER = 'input'
 
 OUTPUT_FOLDER = 'output'
 
+###############################################################################
+#                               Tianchi Testing                               #
+###############################################################################
+
+MODEL_CHECKPOINT = 'checkpoints/tianchi/512x512_jpeg_confthre_0_005/snapshot3050.ckpt'
+
+CONFIG_FILE = 'config/yolov3_eval_digestpath.cfg'
+
 TEST_INPUT_FOLDER = 'testing'
 
 TEST_OUPUT_FOLDER = 'prediction_result/'
 
 # files generated during Tianchi Testing
 TEST_TMP_DATA = 'user_data/jpeg_minipatches/'
+
+USE_CUDA = True
+
+BOARDCACHE = 2
 
 ###############################################################################
 #                                 Minipatches                                  #

@@ -33,6 +33,11 @@ __pycache__/
 input
 output
 
+# tianchi folders
+testing
+prediction_result
+user_data
+
 # kfbreader compiled libraries
 libraries/kfbreader/libopencv_world.so.3.4.5
 # kfbreader symlinks

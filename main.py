@@ -8,6 +8,8 @@ from constants import Dataset
 from utils.classes.cutpatch import MiniPatch, TestMiniPatch
 from utils.data import get_or_create_bndbox_dict, get_or_create_train_test_files, \
     create_bndbox_file
+from tianchi_challenge.classes import MyModel
+from tianchi_challenge.utils import initial_validation_cleaning, process_input_files
 from utils.files import generate_roi_and_bboxes_files
 from utils.plot_tools import plot_img_plus_bounding_boxes
 from utils.utils import recalculate_anchor_boxes, recalculate_anchor_boxes_kmeans_iou, dhash, hamming
@@ -111,4 +113,8 @@ if __name__ == '__main__':
     # import numpy as np
 
     # kmeans = KMeans(n_clusters=2, random_state=42).fit(points2)
-    TestMiniPatch()()
+    # TestMiniPatch()()
+
+    initial_validation_cleaning()
+    model = MyModel()
+    process_input_files(model)

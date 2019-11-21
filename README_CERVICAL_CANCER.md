@@ -50,17 +50,30 @@
 
 2. Run the following lines (modify them as necessary)
 
-   `from utils.plot_tools import plot_img_plus_bounding_boxes`
+	`from utils.plot_tools import plot_img_plus_bounding_boxes`
 
 	`plot_img_plus_bounding_boxes('T2019_999-roi2_33232_15350.jpeg', save_to_disk=True)`
 
 
 ### Testing
 
-1. Create test jpeg minipatches
+1. Set the model checkpoint, yolov3 config file, test input folder (containing kfb ), test output folder and test tmp data properly in your settings file, at Tianchi Testing section.
+
+
+2. Create test jpeg minipatches (it'll take a while)
 
 	`from utils.classes.cutpatch import TestMiniPatch`
 
-   `TestMiniPatch()()`
+	`TestMiniPatch()()`
 
-2.
+3. Analyse and create predictions
+
+	`from tianchi_challenge.classes import MyModel`
+
+    `from tianchi_challenge.utils import initial_validation_cleaning, process_input_files`
+
+    `initial_validation_cleaning()`
+
+    `model = MyModel()`
+
+    `process_input_files(model)`
