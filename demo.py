@@ -12,6 +12,7 @@ from torch.autograd import Variable
 
 from constants import BOX_COLOR, Dataset
 from models.yolov3 import YOLOv3
+import settings
 from utils.kfb import read_roi_json
 from utils.parse_yolo_weights import parse_yolo_weights
 from utils.utils import preprocess, yolobox2label, postprocess
@@ -52,8 +53,13 @@ def main():
     if args.detect_thresh:
         confthre = args.detect_thresh
 
-    # img, _ = read_roi_json(nargs.image)
-    img = cv2.imread(args.image)
+    img = None
+
+    if settings.USE_ROIS:
+        img, _ = read_roi_json(args.image)
+    else:
+        img = cv2.imread(args.image)
+
     img_raw = img.copy()[:, :, ::-1].transpose((2, 0, 1))
     img, info_img = preprocess(img, imgsize, jitter=0)  # info = (h, w, nh, nw, dx, dy)
     img = np.transpose(img / 255., (2, 0, 1))

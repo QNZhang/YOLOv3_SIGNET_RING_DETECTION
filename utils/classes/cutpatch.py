@@ -154,7 +154,7 @@ class MiniPatch:
             read.ReadInfo(
                 os.path.join(self.path_image, roi_json_obj['source']),
                 settings.KFBREADER_SCALE,
-                True
+                False
             )
 
             roi = read.ReadRoi(
@@ -341,7 +341,7 @@ class TestMiniPatch:
             self.read.ReadInfo(
                 os.path.join(self.path_images, kfbfile),
                 settings.KFBREADER_SCALE,
-                True
+                False
             )
 
             h, w = self.read.getHeight(), self.read.getWidth()

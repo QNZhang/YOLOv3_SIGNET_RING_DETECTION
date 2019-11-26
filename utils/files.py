@@ -79,7 +79,7 @@ def generate_roi_and_bboxes_files():
         read.ReadInfo(
             os.path.join(settings.INPUT_FOLDER, kfb_filename),
             settings.KFBREADER_SCALE,
-            True
+            False
         )
         height = read.getHeight()
         width = read.getWidth()

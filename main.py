@@ -35,36 +35,6 @@ def main():
     # plot_img_plus_bounding_boxes('G1900703-2_2019-04-30 09_53_59-lv0-21164-5136-2060-2007.jpeg')
     ###############################################################################
 
-    # # Testing kfbreader #######################################################
-    # path = "/home/giussepi/Downloads/tianchi/neg_0/T2019_121.kfb"
-    # scale = 20
-
-    # read = kfbReader.reader()
-    # read.ReadInfo(path, scale, True)
-    # roi = read.ReadRoi(10240, 10240, 512, 512, scale)
-    # cv.imshow('roi', roi)
-    # cv.waitKey(0)
-
-    # height = read.getHeight()
-    # width = read.getWidth()
-    # scale = read.getReadScale()
-    # print('height: ', height)
-    # print('width: ', width)
-    # print('scale: ', scale)
-
-    # # read.setReadScale(scale=20)
-
-    # roi_0 = read.ReadRoi(5120, 5120, 256, 256, scale=5)
-    # roi_1 = read.ReadRoi(10240, 10240, 512, 512, scale=10)
-    # roi_2 = read.ReadRoi(20480, 20480, 1024, 1024, scale=20)
-
-    # cv.imshow('roi', roi_0)
-    # cv.waitKey(0)
-    # cv.imshow('roi', roi_1)
-    # cv.waitKey(0)
-    # cv.imshow('roi', roi_2)
-    # cv.waitKey(0)
-
 
 if __name__ == '__main__':
     main()
@@ -78,9 +48,13 @@ if __name__ == '__main__':
     # MiniPatch()()
 
     # recalculate_anchor_boxes_kmeans_iou(Dataset.SIGNET_RING, print_results=True, num_centroids=9)
-    # hereee
+
+    ###########################################################################
+    #                               Train model                               #
+    ###########################################################################
+
     # os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard True --checkpoint_interval=50 --eval_interval=50')
-    # os.system('python train.py --tfboard True --checkpoint_interval=50 --eval_interval=50 --checkpoint "checkpoints/snapshot1500.ckpt"')
+    os.system('python train.py --tfboard True --checkpoint_interval=50 --eval_interval=50 --checkpoint "checkpoints/tianchi/512x512_roi_confthre_0_005/snapshot3500.ckpt"')
 
     # os.system('python demo.py --image "/home/giussepi/Downloads/tianchi/positives/T2019_53-roi1_6620_22337.json" --detect_thresh 0.4 --weights weights/yolov3.weights')
     # os.system(
@@ -115,6 +89,6 @@ if __name__ == '__main__':
     # kmeans = KMeans(n_clusters=2, random_state=42).fit(points2)
     # TestMiniPatch()()
 
-    initial_validation_cleaning()
-    model = MyModel()
-    process_input_files(model)
+    # initial_validation_cleaning()
+    # model = MyModel()
+    # process_input_files(model)

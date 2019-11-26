@@ -37,7 +37,7 @@ def read_roi_json(roi_json_filepath, kfb_filepath=''):
 
     read = kfbReader.reader()
     read.setReadScale(settings.KFBREADER_SCALE)
-    read.ReadInfo(kfb_filepath, settings.KFBREADER_SCALE, True)
+    read.ReadInfo(kfb_filepath, settings.KFBREADER_SCALE, False)
 
     return read.ReadRoi(
         roi_file['roi']['x'],

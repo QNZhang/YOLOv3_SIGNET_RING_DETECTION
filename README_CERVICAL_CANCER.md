@@ -11,7 +11,7 @@
 
    `generate_roi_and_bboxes_files()`
 
-## Generate minipatches
+## Generate minipatches and Train the model
 1. Rename `input` and `output` folder from previous step
 
    `mv input input_a`
@@ -35,6 +35,18 @@
    `from utils.classes.cutpatch import MiniPatch`
 
    `MiniPatch()()`
+
+5. Update the `settings.SIGNET_TRAIN_POS_IMG_PATH` to point to the output of MiniPatch
+
+6. Recalculate anchor boxes and update `config/yolov3_default_digestpath.cfg` and `yolov3_eval_digestpath.cfg` properly.
+
+   `recalculate_anchor_boxes_kmeans_iou(Dataset.SIGNET_RING, print_results=True, num_centroids=9)`
+
+7. Make sure that `settings.USE_ROIS` is set to True
+
+8. Train the model
+
+   `os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard True --checkpoint_interval=50 --eval_interval=50')`
 
 ### Create JPEG of minipatches along with their bounding boxes (optional)
 1. Review the function definition of `utils.plot_tools.create_X_cervical_images_plus_bounding_boxes`
