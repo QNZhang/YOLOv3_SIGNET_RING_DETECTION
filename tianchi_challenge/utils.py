@@ -7,6 +7,7 @@ import shutil
 
 import cv2
 import json
+import kfbReader
 import numpy as np
 from PIL import Image
 
@@ -38,8 +39,13 @@ def evaluation(x, y, cut_size, w, h, fimg, model):
     [[x1, y1, x2, y2, score], ...]
 
     """
-    fimg = cv2.imread(fimg.filename)
-    results = model.get_predictions(image=fimg, plot=False)
+    if settings.USE_ROIS:
+        # image = fimg[y:y+cut_size, x:x+cut_size]
+        image = fimg.ReadRoi(x, y, cut_size, cut_size, scale=settings.KFBREADER_SCALE)
+    else:
+        image = cv2.imread(fimg.filename)
+
+    results = model.get_predictions(image=image, plot=False)
 
     if len(results) == 0:
         return None
@@ -86,7 +92,7 @@ def generate_save_json(predictions, fileimg):
         json.dump(pred_list, json_file)
 
 
-def process_input_files(model):
+def process_input_files_jpeg(model):
     """
     * Iterates over the images in settings.INPUT_FOLDER
     * Gets the bouding boxes predictions using the sliding window technique
@@ -120,3 +126,72 @@ def process_input_files(model):
         selected_ids = nms(predictions[:, :4], model.nmsthre, predictions[:, 4])
         predictions = predictions[selected_ids]
         generate_save_json(predictions, '{}.json'.format(name))
+
+
+def process_input_files_roi_json(model):
+    """
+    * Iterates over the images in settings.INPUT_FOLDER
+    * Gets the bouding boxes predictions using the sliding window technique
+    * Applies non maximum suppression
+    * Saves the predictions on settings.OUTPUT_FOLDER
+    """
+    read = kfbReader.reader()
+    read.setReadScale(settings.KFBREADER_SCALE)
+
+    for kfbfile in os.listdir(settings.TEST_INPUT_FOLDER):
+        print(kfbfile)
+        predictions = [[0, 0, 0, 0, 0]]
+        read.ReadInfo(os.path.join(settings.TEST_INPUT_FOLDER, kfbfile), settings.KFBREADER_SCALE, False)
+        w, h = read.getWidth(), read.getHeight()
+        y = 0
+
+        while(y <= (h-settings.CUT_SIZE)):
+            x = 0
+
+            while(x <= (w-settings.CUT_SIZE)):
+                eval_results = evaluation(x, y, settings.CUT_SIZE, w, h, read, model)
+                if eval_results is not None:
+                    predictions = np.vstack((predictions, eval_results))
+                x = x+settings.OVERLAP
+                # print(x)
+
+            x = w - settings.CUT_SIZE
+            eval_results = evaluation(x, y, settings.CUT_SIZE, w, h, read, model)
+            if eval_results is not None:
+                predictions = np.vstack((predictions, eval_results))
+            y = y+settings.OVERLAP
+            # print(y)
+
+        x = 0
+        y = h - settings.CUT_SIZE
+
+        while(x <= (w-settings.CUT_SIZE)):
+            eval_results = evaluation(x, y, settings.CUT_SIZE, w, h, read, model)
+            if eval_results is not None:
+                predictions = np.vstack((predictions, eval_results))
+            x = x+settings.OVERLAP
+            # print(x)
+
+        eval_results = evaluation(
+            w-settings.CUT_SIZE, h-settings.CUT_SIZE, settings.CUT_SIZE, w, h, read, model)
+        if eval_results is not None:
+            predictions = np.vstack((predictions, eval_results))
+
+        predictions = np.delete(predictions, 0, axis=0)
+
+        # applying non maximum suppression
+        selected_ids = nms(predictions[:, :4], model.nmsthre, predictions[:, 4])
+        predictions = predictions[selected_ids]
+
+        print('saving JSON')
+        name, _ = get_name_and_extension(kfbfile)
+        generate_save_json(predictions, '{}.json'.format(name))
+        print('done saving')
+
+
+def process_input_files(model):
+    """ Process the inputs files properly based on settings.USE_ROIS option """
+    if settings.USE_ROIS:
+        process_input_files_roi_json(model)
+    else:
+        process_input_files_jpeg(model)

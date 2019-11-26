@@ -54,7 +54,7 @@ if __name__ == '__main__':
     ###########################################################################
 
     # os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard True --checkpoint_interval=50 --eval_interval=50')
-    os.system('python train.py --tfboard True --checkpoint_interval=50 --eval_interval=50 --checkpoint "checkpoints/tianchi/512x512_roi_confthre_0_005/snapshot3500.ckpt"')
+    # os.system('python train.py --tfboard True --checkpoint_interval=50 --eval_interval=50 --checkpoint "checkpoints/tianchi/512x512_roi_confthre_0_005/snapshot3500.ckpt"')
 
     # os.system('python demo.py --image "/home/giussepi/Downloads/tianchi/positives/T2019_53-roi1_6620_22337.json" --detect_thresh 0.4 --weights weights/yolov3.weights')
     # os.system(
@@ -67,6 +67,13 @@ if __name__ == '__main__':
     ###########################################################################
     # from utils.plot_tools import create_X_cervical_images_plus_bounding_boxes
     # create_X_cervical_images_plus_bounding_boxes((22187, 22188), draw_bbox=False)
+
+    ###########################################################################
+    #                             TIANCHI TESTING                             #
+    ###########################################################################
+
+    initial_validation_cleaning()
+    process_input_files(MyModel())
 
     ###########################################################################
     #                              traing kkmeans                          #
@@ -88,7 +95,3 @@ if __name__ == '__main__':
 
     # kmeans = KMeans(n_clusters=2, random_state=42).fit(points2)
     # TestMiniPatch()()
-
-    # initial_validation_cleaning()
-    # model = MyModel()
-    # process_input_files(model)

@@ -67,12 +67,13 @@
 	`plot_img_plus_bounding_boxes('T2019_999-roi2_33232_15350.jpeg', save_to_disk=True)`
 
 
-### Testing
+### TIANCHI Testing
 
-1. Set the model checkpoint, yolov3 config file, test input folder (containing kfb ), test output folder and test tmp data properly in your settings file, at Tianchi Testing section.
+NOTE: It's recommended to train and test reading the ROIs json files (`settings.USE_ROIS=True`)
 
+1. Set the model checkpoint, yolov3 config file, test input folder (containing kfb ), test output folder and test tmp data properly in your settings file, at Tianchi Testing section. Furthemore, if not using jpegs minipatches make sure to set settings.USE_ROIS to True.
 
-2. Create test jpeg minipatches (it'll take a while)
+2. If using jpegs minipatches (it means you trained your model using `settings.USE_ROIS=False`), create test jpeg minipatches (it'll take a while)
 
 	`from utils.classes.cutpatch import TestMiniPatch`
 
@@ -86,6 +87,4 @@
 
     `initial_validation_cleaning()`
 
-    `model = MyModel()`
-
-    `process_input_files(model)`
+    `process_input_files(MyModel())`
