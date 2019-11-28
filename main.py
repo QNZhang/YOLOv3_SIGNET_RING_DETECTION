@@ -47,6 +47,11 @@ if __name__ == '__main__':
     # generate_roi_and_bboxes_files()
     # MiniPatch()()
 
+    # TODO: Modify this to create train validation splits properly....
+    # Maybe create a big function that splits creates the minipatches properly...
+    # think carefully on this....
+    # create_bndbox_file()
+
     # recalculate_anchor_boxes_kmeans_iou(Dataset.SIGNET_RING, print_results=True, num_centroids=9)
 
     ###########################################################################
@@ -54,7 +59,7 @@ if __name__ == '__main__':
     ###########################################################################
 
     # os.system('python train.py --weights_path weights/darknet53.conv.74 --tfboard True --checkpoint_interval=50 --eval_interval=50')
-    # os.system('python train.py --tfboard True --checkpoint_interval=50 --eval_interval=50 --checkpoint "checkpoints/tianchi/512x512_roi_confthre_0_005/snapshot3500.ckpt"')
+    os.system('python train.py --tfboard True --checkpoint_interval=50 --eval_interval=50 --checkpoint "checkpoints/tianchi/512x512_ious_splitted_confthre_0_005/snapshot4450.ckpt"')
 
     # os.system('python demo.py --image "/home/giussepi/Downloads/tianchi/positives/T2019_53-roi1_6620_22337.json" --detect_thresh 0.4 --weights weights/yolov3.weights')
     # os.system(
@@ -72,8 +77,8 @@ if __name__ == '__main__':
     #                             TIANCHI TESTING                             #
     ###########################################################################
 
-    initial_validation_cleaning()
-    process_input_files(MyModel())
+    # initial_validation_cleaning()
+    # process_input_files(MyModel())
 
     ###########################################################################
     #                              traing kkmeans                          #
@@ -95,3 +100,35 @@ if __name__ == '__main__':
 
     # kmeans = KMeans(n_clusters=2, random_state=42).fit(points2)
     # TestMiniPatch()()
+
+    ###########################################################################
+    #                    Splitting train/validation dataset                    #
+    ###########################################################################
+
+    # import shutil
+
+    # from sklearn.model_selection import train_test_split
+
+    # from utils.files import get_name_and_extension
+
+    # files = list(filter(lambda x: x.endswith('.kfb'), os.listdir(settings.SIGNET_TRAIN_POS_IMG_PATH)))
+    # train, validation = train_test_split(files, test_size=0.2, random_state=42, shuffle=True)
+
+    # for file_ in train:
+    #     shutil.move(os.path.join(settings.SIGNET_TRAIN_POS_IMG_PATH, file_), 'positives_splitted/train/')
+    #     json_file = os.path.join(
+    #         settings.SIGNET_TRAIN_POS_IMG_PATH,
+    #         '{}.json'.format(get_name_and_extension(file_)[0])
+    #     )
+    #     shutil.move(json_file, 'positives_splitted/train')
+
+    # for file_ in validation:
+    #     shutil.move(os.path.join(settings.SIGNET_TRAIN_POS_IMG_PATH, file_), 'positives_splitted/validation/')
+    #     json_file = os.path.join(
+    #         settings.SIGNET_TRAIN_POS_IMG_PATH,
+    #         '{}.json'.format(get_name_and_extension(file_)[0])
+    #     )
+    #     shutil.move(json_file, 'positives_splitted/validation')
+
+    # create minipathches
+    # create pickle files for each train / valv
