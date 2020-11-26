@@ -1,7 +1,22 @@
+# -*- coding: utf-8 -*-
+""" utils/utils """
+
 from __future__ import division
-import torch
-import numpy as np
+import os
+
 import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from sklearn.cluster import KMeans
+import torch
+import xml.etree.ElementTree as ET
+
+from constants import Dataset
+from core.exceptions import DatasetIdInvalid
+import settings
+from utils.managers.signet_ring_cell_dataset import SignetRingMGR
+from .kmeans_iou import kmeans, avg_iou
 
 
 def nms(bbox, thresh, score=None, limit=None):
@@ -38,8 +53,8 @@ def nms(bbox, thresh, score=None, limit=None):
         tl = np.maximum(b[:2], bbox[selec, :2])
         br = np.minimum(b[2:], bbox[selec, 2:])
         area = np.prod(br - tl, axis=1) * (tl < br).all(axis=1)
-
         iou = area / (bbox_area[i] + bbox_area[selec] - area)
+
         if (iou >= thresh).any():
             continue
 
@@ -153,10 +168,10 @@ def bboxes_iou(bboxes_a, bboxes_b, xyxy=True):
         area_b = torch.prod(bboxes_b[:, 2:] - bboxes_b[:, :2], 1)
     else:
         tl = torch.max((bboxes_a[:, None, :2] - bboxes_a[:, None, 2:] / 2),
-                        (bboxes_b[:, :2] - bboxes_b[:, 2:] / 2))
+                       (bboxes_b[:, :2] - bboxes_b[:, 2:] / 2))
         # bottom right
         br = torch.min((bboxes_a[:, None, :2] + bboxes_a[:, None, 2:] / 2),
-                        (bboxes_b[:, :2] + bboxes_b[:, 2:] / 2))
+                       (bboxes_b[:, :2] + bboxes_b[:, 2:] / 2))
 
         area_a = torch.prod(bboxes_a[:, 2:], 1)
         area_b = torch.prod(bboxes_b[:, 2:], 1)
@@ -255,7 +270,7 @@ def preprocess(img, imgsize, jitter, random_placing=False):
         dw = jitter * w
         dh = jitter * h
         new_ar = (w + np.random.uniform(low=-dw, high=dw))\
-                 / (h + np.random.uniform(low=-dh, high=dh))
+            / (h + np.random.uniform(low=-dh, high=dh))
     else:
         new_ar = w / h
 
@@ -281,6 +296,7 @@ def preprocess(img, imgsize, jitter, random_placing=False):
     info_img = (h, w, nh, nw, dx, dy)
     return sized, info_img
 
+
 def rand_scale(s):
     """
     calculate random scaling factor
@@ -294,6 +310,7 @@ def rand_scale(s):
     if np.random.rand() > 0.5:
         return scale
     return 1 / scale
+
 
 def random_distort(img, hue, saturation, exposure):
     """
@@ -362,3 +379,165 @@ def get_coco_label_names():
     coco_cls_colors = np.random.randint(128, 255, size=(80, 3))
 
     return coco_label_names, coco_class_ids, coco_cls_colors
+
+
+def get_tensorboard_log_path(option):
+    """ Returns the tensorboard log path for the chosen option """
+    if not Dataset.is_valid_option(option):
+        raise DatasetIdInvalid()
+
+    log_paths = {
+        Dataset.COCO: settings.TENSORBOARD_COCO_LOG_PATH,
+        Dataset.SIGNET_RING: settings.TENSORBOARD_SIGNET_LOG_PATH,
+    }
+
+    return log_paths[option]
+
+
+def recalculate_anchor_boxes(option, plot_charts=False, round_centroid_values=True):
+    """
+    Recalculates and returns the 9 anchor boxes to be used by YOLOv3
+    Inspired on: https://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_digits.html
+    Returns numpy.ndarray [9, 2]
+    """
+    if not Dataset.is_valid_option(option):
+        raise DatasetIdInvalid()
+
+    if option == Dataset.COCO:
+        # TODO: IMPLEMENT ANCHOR BOXES RECALCULATION FOR COCO
+        raise NotImplementedError(
+            'Recalculation of anchor boxes for COCO has not been implemented yet.')
+
+    if option == Dataset.SIGNET_RING:
+        mgr = SignetRingMGR(settings.SIGNET_BOUNDING_BOXES_PATH)
+        boundingboxes_dimentions = tuple([
+            (bbox.width, bbox.height) for bbox in mgr.get_annotations(mgr.get_img_ids())])
+        kmeans = KMeans(n_clusters=9, random_state=42).fit(boundingboxes_dimentions)
+        boundingboxes_dimentions = np.array(boundingboxes_dimentions)
+        x_min, y_min = boundingboxes_dimentions[:, 0].min() - 1, \
+            boundingboxes_dimentions[:, 1].min() - 1
+        x_max, y_max = boundingboxes_dimentions[:, 0].max() + 1, \
+            boundingboxes_dimentions[:, 1].max() + 1
+        h = 0.2
+        xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+        # Obtain labels for each point in mesh. Use last trained model.
+        Z = kmeans.predict(np.c_[xx.ravel(), yy.ravel()])
+        # Put the result into a color plot
+        Z = Z.reshape(xx.shape)
+        centroids = kmeans.cluster_centers_
+
+        if round_centroid_values:
+            centroids = np.array(list(map(
+                lambda x: [int(round(x[0])), int(round(x[1]))],
+                centroids
+            )))
+
+        if not plot_charts:
+            return centroids
+
+        fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=[14, 9])
+
+        fig.suptitle('K-means clustering on Signet Ring dataset\n'
+                     'Centroids are marked with white cross', fontsize=20)
+
+        ax1.imshow(Z, interpolation='nearest',
+                   extent=(xx.min(), xx.max(), yy.min(), yy.max()),
+                   cmap=plt.cm.Paired,
+                   aspect='auto', origin='lower')
+        # Plot the centroids as a white X
+        ax1.scatter(centroids[:, 0], centroids[:, 1],
+                    marker='x', s=169, linewidths=3,
+                    color='r', zorder=10)
+        ax1.set_xlim(x_min, x_max)
+        ax1.set_ylim(y_min, y_max)
+        # ax1.set_xticklabels(())
+        # ax1.set_yticklabels(())
+        ax1.set_xlabel('Bounding box width')
+        ax1.set_ylabel('Bounding box height')
+
+        ax2.imshow(Z, interpolation='nearest',
+                   extent=(xx.min(), xx.max(), yy.min(), yy.max()),
+                   cmap=plt.cm.Paired,
+                   aspect='auto', origin='lower')
+
+        ax2.plot(boundingboxes_dimentions[:, 0], boundingboxes_dimentions[:, 1], 'k.', markersize=2)
+        # Plot the centroids as a white X
+        ax2.scatter(centroids[:, 0], centroids[:, 1],
+                    marker='x', s=169, linewidths=3,
+                    color='w', zorder=10)
+
+        # # Plot new kmeans-IoU centroids
+        # ax2.scatter([25, 42, 46, 44, 53, 62, 62, 72, 87], [50, 44, 29, 66, 54, 42, 72, 57, 88],
+        #             marker='o', s=169, linewidths=3,
+        #             color='r', zorder=10)
+
+        ax2.set_xlim(x_min, x_max)
+        ax2.set_ylim(y_min, y_max)
+        # ax2.set_xticklabels(())
+        # ax2.set_yticklabels(())
+        ax2.set_xlabel('Bounding box width')
+        ax2.set_ylabel('Bounding box height')
+
+        # ax3.hist(kmeans.predict(boundingboxes_dimentions), 9, density=True,
+        #          facecolor='g', alpha=0.7, edgecolor='black', linewidth=1,
+        #          orientation='horizontal')
+        # ax3.grid(True)
+        # ax3.set_xlabel('Probability')
+        # ax3.set_ylabel('Bins')
+
+        pp = pd.DataFrame({'Prediction': kmeans.predict(boundingboxes_dimentions)})
+        pp['Prediction'].hist(ax=ax3, grid=True, bins=9)
+
+        plt.tight_layout()
+        # Make space for title
+        plt.subplots_adjust(top=0.85)
+        plt.show()
+
+        return centroids
+
+    raise NotImplementedError
+
+
+def recalculate_anchor_boxes_kmeans_iou(option, print_results=False, num_centroids=9):
+    """
+    Recalculates and returns the 9 anchor boxes to be used by YOLOv3
+    Inspired on: https://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_digits.html
+    Returns numpy.ndarray [9, 2]
+
+    Inspired on: https://github.com/lars76/kmeans-anchor-boxes/blob/master/example.py
+    """
+    bndboxes = list()
+
+    if option == Dataset.COCO:
+        # TODO: IMPLEMENT ANCHOR BOXES RECALCULATION FOR COCO
+        raise NotImplementedError(
+            'Recalculation of anchor boxes for COCO has not been implemented yet.')
+
+    if option == Dataset.SIGNET_RING:
+        for xml_file in tuple(
+                filter(lambda x: x.endswith('.xml'), os.listdir(settings.SIGNET_TRAIN_POS_IMG_PATH))):
+            root = ET.parse(os.path.join(settings.SIGNET_TRAIN_POS_IMG_PATH, xml_file)).getroot()
+            size = root.find('./size')
+            height, width = int(size.find('height').text), int(size.find('width').text)
+
+            for object_ in root.findall('./object'):
+                xmin = int(object_.findtext('bndbox/xmin'))  # / width
+                ymin = int(object_.findtext('bndbox/ymin'))  # / height
+                xmax = int(object_.findtext('bndbox/xmax'))  # / width
+                ymax = int(object_.findtext('bndbox/ymax'))  # / height
+
+                bndboxes.append([xmax - xmin, ymax - ymin])
+
+        bndboxes = np.array(bndboxes)
+        new_anchors = kmeans(bndboxes, k=num_centroids)
+
+        if print_results:
+            print("Accuracy: {:.2f}%".format(avg_iou(bndboxes, new_anchors) * 100))
+            print("Boxes:\n {}".format(new_anchors))
+
+            ratios = np.around(new_anchors[:, 0] / new_anchors[:, 1], decimals=2).tolist()
+            print("Ratios:\n {}".format(sorted(ratios)))
+
+        return new_anchors
+
+    raise NotImplementedError

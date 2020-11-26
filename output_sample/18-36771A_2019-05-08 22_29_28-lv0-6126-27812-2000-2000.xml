@@ -1,0 +1,15 @@
+<annotation>
+ <folder>annotations</folder>
+ <filename>18-36771A_2019-05-08 22_29_28-lv0-6126-27812-2000-2000.jpeg</filename>
+ <source>
+  <database>The Ring Cell Database</database>
+  <annotation>Ring Cell Dataset</annotation>
+  <image>flickr</image>
+ </source>
+ <size>
+  <width>2000</width>
+  <height>2000</height>
+  <depth>3</depth>
+ </size>
+ <segmented>0</segmented>
+</annotation>

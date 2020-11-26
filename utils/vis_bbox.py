@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def vis_bbox(img, bbox, label=None, score=None, label_names=None,
              instance_colors=None, alpha=1., linewidth=3., ax=None):
     """Visualize bounding boxes inside the image.
@@ -37,7 +38,7 @@ def vis_bbox(img, bbox, label=None, score=None, label_names=None,
 
     from: https://github.com/chainer/chainercv
     """
-             
+
     if label is not None and not len(bbox) == len(label):
         raise ValueError('The length of label must be same as that of bbox')
     if score is not None and not len(bbox) == len(score):
@@ -45,7 +46,7 @@ def vis_bbox(img, bbox, label=None, score=None, label_names=None,
 
     # Returns newly instantiated matplotlib.axes.Axes object if ax is None
     if ax is None:
-        fig = plt.figure()
+        fig = plt.figure(figsize=(15, 13))
         ax = fig.add_subplot(1, 1, 1)
     ax.imshow(img.transpose((1, 2, 0)).astype(np.uint8))
     # If there is no bounding box to display, visualize the image and exit.

@@ -1,6 +1,10 @@
 # YOLOv3 in Pytorch
 Pytorch implementation of YOLOv3
 
+**After following the installation instructions from this file, review [README_SIGNET_RING_DETECTION.md](README_SIGNET_RING_DETECTION.md) and [challenge/README.md](challenge/README.md)**
+
+<p align="left"><img src="output_sample/2018_64982_1-3_2019-02-25%2021_57_36-lv0-36515-58465-2013-2071.jpeg" height="320"\></p>
+
 <p align="left"><img src="data/innsbruck_result.png" height="160"\>  <img src="data/mountain_result.png" height="160"\></p>
 
 ## What's New
